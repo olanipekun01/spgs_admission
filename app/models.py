@@ -67,6 +67,9 @@ class Programme(models.Model):
     duration = models.IntegerField(blank=True, null=True)
     degree = models.CharField(blank=True, null=True, max_length=50)
 
+    def __str__(self):
+        return self.name
+
 class Application(models.Model):
     applicant = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='application')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -100,47 +103,6 @@ class Instructor(models.Model):
     def __str__(self):
         return self.position
 
-class PersonalDetails(models.Model):
-    GENDER_CHOICES = [
-        ('male', 'Male'),
-        ('female', 'Female'),
-    ]
-
-    DENOMINATION_CHOICES = [
-        ('christian', 'Christian'),
-        ('muslim', 'Muslim'),
-        ('traditional', 'Traditional'),
-    ]
-
-    PROGRAM_CHOICES = [
-        ('electricalElectronicsEngineering', 'B.Eng. Electrical & Electronics Engineering'),
-        ('computerEngineering', 'B.Eng. Computer Engineering'),
-        ('mechatronicsEngineering', 'B.Eng. Mechatronics Engineering'),
-        ('mechanicalEngineering', 'B.Eng. Mechanical Engineering'),
-        ('biomedicalEngineering', 'B.Eng. Biomedical Engineering'),
-        ('civilEnvironmentalEngineering', 'B.Eng. Civil and Environmental Engineering'),
-    ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='personal_details', default=None)
-    first_name = models.CharField(max_length=100, blank=True, null=True)
-    last_name = models.CharField(max_length=100, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
-    phone = models.CharField(max_length=15, blank=True, null=True)
-    date_of_birth = models.DateField(blank=True, null=True)
-    place_of_birth = models.CharField(max_length=150, blank=True, null=True)
-    state_of_origin = models.CharField(max_length=100, blank=True, null=True)
-    nationality = models.CharField(max_length=100,blank=True, null=True)
-    local_government_area = models.CharField(max_length=100, blank=True, null=True)
-    denomination = models.CharField(max_length=15, choices=DENOMINATION_CHOICES, blank=True, null=True)
-    address = models.TextField( blank=True, null=True)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
-    desired_program = models.ForeignKey(Programme, on_delete=models.CASCADE, null=True, default=None)
-    session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, default=None)
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name} - {self.email}"
-
 
 class PersonalInfo(models.Model):
 
@@ -166,7 +128,7 @@ class PersonalInfo(models.Model):
 
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='personal_details', default=None)
+    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='personal_info', default=None)
     title = models.CharField(max_length=100, blank=True, null=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
@@ -189,7 +151,7 @@ class PersonalInfo(models.Model):
 
 class NextOfKin(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='personal_details', default=None)
+    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='nok', default=None)
     title = models.CharField(max_length=100, blank=True, null=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
@@ -204,7 +166,7 @@ class NextOfKin(models.Model):
 
 class EducationHistory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='personal_details', default=None)
+    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='education_history', default=None)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, default=None)
     institution = models.CharField(max_length=255)
     fromDate = models.DateField(blank=True, null=True)
@@ -218,30 +180,42 @@ class EducationHistory(models.Model):
 
 class WorkExperience(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='personal_details', default=None)
+    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='work_experience', default=None)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, default=None)
     post = models.CharField(max_length=255)
     employer = models.CharField(max_length=255)
     date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.employer} {self.post} - {self.applicant.applicant.username}"
     # ...
 
 class AdditionalInformation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='personal_details', default=None)
+    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='additional_info', default=None)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, default=None)
     info = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.info} - {self.applicant.applicant.username}"
 
 class OtherInformation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='personal_details', default=None)
+    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='other_info', default=None)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, default=None)
     info = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return f"{self.info} - {self.applicant.applicant.username}"
+
 class StatementOfPurpose(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='personal_details', default=None)
+    applicant = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='sop', default=None)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, default=None)
     sop_file = models.FileField(upload_to='sop/')
+
+    def __str__(self):
+        return f"{self.applicant.applicant.username}"
 
 class Referral(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -253,3 +227,7 @@ class Referral(models.Model):
     submitted = models.BooleanField(default=False)
     recommendation_text = models.TextField(null=True, blank=True)
     recommendation = models.FileField(upload_to='recommendation/')
+
+
+    def __str__(self):
+        return f"{self.info} - {self.applicant.applicant.username}"

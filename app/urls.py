@@ -20,7 +20,9 @@ handler404 = custom_404_view
 app_name = "app"
 
 urlpatterns = [
-    path('', views.Index, name="index"),
+    path('accounts/login/', views.Login, name="login"),
+    path('accounts/signup/', views.Signup, name="signup"),
+    path('accounts/logout/', views.logout, name="logout"),
 ]
 
 if settings.DEBUG:

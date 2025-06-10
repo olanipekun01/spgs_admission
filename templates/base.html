@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Get information about achievers on going addmission process for 2024/2025 admissions, check out programmes offered at Achievers University">
+    <Meta name="keywords" content="achievers university, achievers university owo, admissions, application, screening, post utme">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://res.cloudinary.com/dztirmlfv/image/upload/v1738530217/engineeringlogobw_b91waz.png" alt="Faculty Logo" class=" w-[120px]" type="image/x-icon">
+  <title>{% block title %}My Django App{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+        }
+
+        #xBar {
+            display: none;
+        }
+
+        #menuBar.active {
+            display: none;
+        }
+
+        #navBar.active {
+            display: flex;
+        }
+
+        #xBar.active {
+            display: flex;
+        }
+
+        .rotate-180 {
+      transform: rotate(180deg);
+    }
+
+  </style>
+  
+</head>
+<body class="min-h-screen bg-white">
+
+  <!-- Top Bar -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <!-- Top Bar -->
+    <div class="bg-blue-900 text-white py-2">
+      <div class="container mx-auto px-4 flex justify-between items-center text-sm">
+        <div class="flex items-center space-x-4">
+          <span>📧 info@achieverspostgraduate.edu.ng</span>
+          <span>📞 +234 803 123 4567</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="/student-portal" class="hover:text-blue-200">Student Portal</a>
+          <a href="/staff-portal" class="hover:text-blue-200">Staff Portal</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Header -->
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/" class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center">
+            <span class="text-white font-bold text-xl">AU</span>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-blue-900">Achievers University</h1>
+            <p class="text-sm text-gray-600">School of Postgraduate, Owo</p>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex items-center space-x-8">
+          <!-- Academics Dropdown -->
+          <div class="relative group" onmouseenter="showDropdown('academics')" onmouseleave="hideDropdown()">
+            <button class="flex items-center space-x-1 font-medium hover:text-blue-900">
+              <span>Academics</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            <div id="academicsDropdown" class="hidden absolute top-full left-0 mt-2 w-64 bg-white shadow-lg rounded-lg border z-50">
+              <!-- Items inserted by JS -->
+            </div>
+          </div>
+
+          <!-- Eportal Dropdown -->
+          <div class="relative group" onmouseenter="showDropdown('eportal')" onmouseleave="hideDropdown()">
+            <button class="flex items-center space-x-1 font-medium hover:text-blue-900">
+              <span>Eportal</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            <div id="eportalDropdown" class="hidden absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg border z-50">
+              <!-- Items inserted by JS -->
+            </div>
+          </div>
+
+          <a href="/forms" class="font-medium hover:text-blue-900">Forms</a>
+          <a href="/payments" class="font-medium hover:text-blue-900">Payments</a>
+          <a href="/contact" class="font-medium hover:text-blue-900">Contact Us</a>
+          <a href="/about" class="font-medium hover:text-blue-900">About Us</a>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <button class="lg:hidden" onclick="toggleMobileMenu()">
+          <svg id="menuIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <!-- Mobile Navigation -->
+      <div id="mobileMenu" class="lg:hidden hidden mt-4 pb-4 border-t">
+        <nav class="flex flex-col space-y-2 mt-4">
+          <details>
+            <summary class="flex items-center justify-between py-2 cursor-pointer">
+              <span>Academics</span>
+              <svg class="w-4 h-4 transition-transform"><path d="M19 9l-7 7-7-7" /></svg>
+            </summary>
+            <div class="ml-4 mt-2 space-y-2" id="mobileAcademicsDropdown">
+              <!-- Items inserted by JS -->
+            </div>
+          </details>
+
+          <details>
+            <summary class="flex items-center justify-between py-2 cursor-pointer">
+              <span>Eportal</span>
+              <svg class="w-4 h-4 transition-transform"><path d="M19 9l-7 7-7-7" /></svg>
+            </summary>
+            <div class="ml-4 mt-2 space-y-2" id="mobileEportalDropdown">
+              <!-- Items inserted by JS -->
+            </div>
+          </details>
+
+          <a href="/forms" class="py-2 hover:text-blue-900">Forms</a>
+          <a href="/payments" class="py-2 hover:text-blue-900">Payments</a>
+          <a href="/contact" class="py-2 hover:text-blue-900">Contact Us</a>
+          <a href="/about" class="py-2 hover:text-blue-900">About Us</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  {% block content %}
+    <p>Welcome to My Django App!</p>
+    {% endblock %}
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white">
+  <div class="container mx-auto px-4 py-16">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- University Info -->
+      <div class="space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+            <span class="text-white font-bold">AU</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">Achievers University</h3>
+            <p class="text-sm text-gray-400">School of Postgraduate, Owo</p>
+          </div>
+        </div>
+        <p class="text-gray-400 text-sm">
+          Excellence in postgraduate education, research, and innovation. Preparing leaders for tomorrow's challenges.
+        </p>
+        <div class="flex space-x-4">
+          <a href="#" class="text-gray-400 hover:text-white" aria-label="Facebook">
+            <!-- Facebook Icon -->
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M22 12A10 10 0 1 0 10.9 21.95v-6.35H8v-2.6h2.9V10.1c0-2.8 1.66-4.35 4.21-4.35 1.22 0 2.5.22 2.5.22v2.7H16.6c-1.45 0-1.9.9-1.9 1.8v2.15H18l-.5 2.6h-2.8V22A10 10 0 0 0 22 12z"/></svg>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-white" aria-label="Twitter">
+            <!-- Twitter Icon -->
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53A4.48 4.48 0 0 0 22.4 1a9.09 9.09 0 0 1-2.88 1.1A4.52 4.52 0 0 0 16.6 0c-2.5 0-4.5 2.1-4.5 4.7 0 .36.04.71.12 1.04C8.08 5.6 5.5 4.2 3.9 2.1a4.81 4.81 0 0 0-.6 2.4c0 1.6.8 3 2 3.9a4.48 4.48 0 0 1-2-.6v.05c0 2.3 1.6 4.2 3.7 4.6a4.52 4.52 0 0 1-2 .1c.6 1.9 2.3 3.2 4.4 3.2A9.04 9.04 0 0 1 2 19.5 12.94 12.94 0 0 0 8 21c7.5 0 11.6-6.3 11.6-11.8v-.6A8.18 8.18 0 0 0 23 3z"/></svg>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-white" aria-label="LinkedIn">
+            <!-- LinkedIn Icon -->
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M4.98 3.5A2.5 2.5 0 1 1 2.5 6a2.5 2.5 0 0 1 2.48-2.5zM2 8h6v12H2zm7.5 0h5.6v1.7h.1c.8-1.4 2.6-2 4.1-2 4.4 0 5.2 2.9 5.2 6.7V20H18v-5.5c0-1.3 0-3-2-3s-2.3 1.4-2.3 2.9V20H9.5z"/></svg>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-white" aria-label="Instagram">
+            <!-- Instagram Icon -->
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm10 2c1.7 0 3 1.3 3 3v10c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7c0-1.7 1.3-3 3-3h10zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm4.5-2a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/about" class="text-gray-400 hover:text-white">About Us</a></li>
+          <li><a href="/academics/programmes" class="text-gray-400 hover:text-white">Programmes</a></li>
+          <li><a href="/academics/admissions" class="text-gray-400 hover:text-white">Admissions</a></li>
+          <li><a href="/academics/research-areas" class="text-gray-400 hover:text-white">Research</a></li>
+          <li><a href="/forms" class="text-gray-400 hover:text-white">Forms</a></li>
+          <li><a href="/payments" class="text-gray-400 hover:text-white">Payments</a></li>
+        </ul>
+      </div>
+
+      <!-- Student Services -->
+      <div>
+        <h4 class="text-lg font-semibold mb-4">Student Services</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/eportal/student-portal" class="text-gray-400 hover:text-white">Student Portal</a></li>
+          <li><a href="/eportal/application" class="text-gray-400 hover:text-white">Apply Online</a></li>
+          <li><a href="/academics/fees-funding" class="text-gray-400 hover:text-white">Fees & Funding</a></li>
+          <li><a href="/academics/international-students" class="text-gray-400 hover:text-white">International Students</a></li>
+          <li><a href="/library" class="text-gray-400 hover:text-white">Library</a></li>
+          <li><a href="/support" class="text-gray-400 hover:text-white">Student Support</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Info -->
+      <div>
+        <h4 class="text-lg font-semibold mb-4">Contact Information</h4>
+        <div class="space-y-3 text-sm">
+          <div class="flex items-start space-x-3">
+            <svg class="w-4 h-4 mt-1 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10.5c0 7-9 12.5-9 12.5S3 17.5 3 10.5a9 9 0 0 1 18 0z"/><circle cx="12" cy="10.5" r="3"/></svg>
+            <div class="text-gray-400">
+              <p>Achievers University</p>
+              <p>School of Postgraduate</p>
+              <p>Owo, Ondo State, Nigeria</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.85 19.85 0 0 1-8.63-3.07A19.49 19.49 0 0 1 3.16 9.81 19.85 19.85 0 0 1 .92 1.18 2 2 0 0 1 2.92 0h3a2 2 0 0 1 2 1.72 12.26 12.26 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 8.09a16 16 0 0 0 8.32 8.32l1.45-1.45a2 2 0 0 1 2.11-.45 12.26 12.26 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span class="text-gray-400">+234 803 123 4567</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+            <span class="text-gray-400">info@achieverspostgraduate.edu.ng</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-800 mt-12 pt-8">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <p class="text-gray-400 text-sm">
+          © <span id="currentYear"></span> Achievers University School of Postgraduate. All rights reserved.
+        </p>
+        <div class="flex space-x-6 mt-4 md:mt-0">
+          <a href="/privacy" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
+          <a href="/terms" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
+          <a href="/sitemap" class="text-gray-400 hover:text-white text-sm">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+  
+</div>
+
+
+
+    <script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+      const academics = [
+        "Why AU Postgraduate College", "Contact Us", "Research Areas",
+        "Fees & Funding", "Programmes", "Admissions", "International Students"
+      ];
+      const eportal = ["Application", "Student Portal"];
+
+      function slugify(text) {
+        return text.toLowerCase().replace(/\s+/g, "-");
+      }
+
+      function populateDropdown(id, items, basePath) {
+        const container = document.getElementById(id);
+        container.innerHTML = items.map(item => {
+          const path = item === "Contact Us" && basePath === "/academics"
+            ? "/contact"
+            : `${basePath}/${slugify(item)}`;
+          return `<a href="${path}" class="block px-4 py-3 text-sm border-b hover:bg-blue-50 hover:text-blue-900">${item}</a>`;
+        }).join("");
+      }
+
+      populateDropdown("academicsDropdown", academics, "/academics");
+      populateDropdown("eportalDropdown", eportal, "/eportal");
+      populateDropdown("mobileAcademicsDropdown", academics, "/academics");
+      populateDropdown("mobileEportalDropdown", eportal, "/eportal");
+
+      function showDropdown(type) {
+        hideDropdown();
+        document.getElementById(`${type}Dropdown`).classList.remove("hidden");
+      }
+
+      function hideDropdown() {
+        document.getElementById("academicsDropdown").classList.add("hidden");
+        document.getElementById("eportalDropdown").classList.add("hidden");
+      }
+
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobileMenu");
+        const menuIcon = document.getElementById("menuIcon");
+        const closeIcon = document.getElementById("closeIcon");
+
+        const isOpen = !menu.classList.contains("hidden");
+        if (isOpen) {
+          menu.classList.add("hidden");
+          menuIcon.classList.remove("hidden");
+          closeIcon.classList.add("hidden");
+        } else {
+          menu.classList.remove("hidden");
+          menuIcon.classList.add("hidden");
+          closeIcon.classList.remove("hidden");
+        }
+      }
+
+
+    const menuBar = document.getElementById('menuBar');
+    const navBar = document.getElementById('navBar');
+    const xRegular = document.getElementById('xBar');
+    const faqs = document.querySelectorAll(".faq");
+
+    menuBar.addEventListener("click", function () {
+        navBar.classList.toggle('active');
+        xRegular.classList.toggle('active');
+        menuBar.classList.toggle('active');
+    });
+
+    xRegular.addEventListener("click", function() {
+        navBar.classList.toggle('active');
+        xRegular.classList.toggle('active');
+        menuBar.classList.toggle('active');
+    });
+  </script>
+
+{% block extra_scripts %}{% endblock %}
+
+</body>
+</html>
