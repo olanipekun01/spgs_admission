@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Your Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    {% load static %}
+    <style>
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-[#722F37]">SPA</h1>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-lg font-medium text-gray-700">Application Form</h2>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-1 text-gray-600 hover:text-gray-900" aria-label="Notifications">
+                        <i data-lucide="bell" class="h-4 w-4"></i>
+                    </button>
+                    <button class="p-1 text-gray-600 hover:text-gray-900" aria-label="Settings">
+                        <i data-lucide="settings" class="h-4 w-4"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="{% static 'placeholder.svg?height=40&width=40' %}" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span class="text-sm font-medium text-gray-700">{{ user.first_name }} {{ user.last_name }}</span>
+                    </div>
+                    <button class="p-1 text-gray-600 hover:text-gray-900" aria-label="Log out">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-700">Application Progress</h3>
+                <span class="text-sm text-gray-500">Step 6 of 6</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Review Your Application</h1>
+            <p class="text-gray-600">
+                Please review all the information below carefully before submitting your application. Ensure all details are accurate and complete.
+            </p>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="shadow-lg border-0 mb-6 bg-white rounded-lg">
+            <div class="p-6">
+                <h2 class="text-xl flex items-center font-semibold">
+                    <i data-lucide="user" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                    Personal Information
+                </h2>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-700">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><strong>Programme:</strong> {{ personal_info.programme }}</div>
+                    <div><strong>Area of Specialization:</strong> {{ personal_info.area_of_specialization }}</div>
+                    <div><strong>Full Name:</strong> {{ personal_info.title }} {{ personal_info.first_name }} {{ personal_info.middle_name }} {{ personal_info.surname }}</div>
+                    <div><strong>Date of Birth:</strong> {{ personal_info.date_of_birth }}</div>
+                    <div><strong>Place of Birth:</strong> {{ personal_info.place_of_birth }}</div>
+                    <div><strong>State of Origin:</strong> {{ personal_info.state_of_origin }}</div>
+                    <div><strong>Nationality:</strong> {{ personal_info.nationality }}</div>
+                    <div><strong>Gender:</strong> {% if personal_info.gender == "M" %}Male{% else %}Female{% endif %}</div>
+                    <div><strong>Marital Status:</strong> {{ personal_info.marital_status|capfirst }}</div>
+                    <div><strong>Religious Affiliation:</strong> {% if personal_info.religious_affiliation == "others" %}{{ personal_info.other_religion }}{% else %}{{ personal_info.religious_affiliation|capfirst }}{% endif %}</div>
+                </div>
+                <div class="space-y-2">
+                    <div><strong>Mailing Address:</strong> {{ personal_info.mailing_address }}</div>
+                    <div><strong>Mobile Phone:</strong> {{ personal_info.mobile_phone }}</div>
+                    <div><strong>Email:</strong> {{ personal_info.email }}</div>
+                </div>
+                <a href="/apply/1" class="inline-block px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">Edit</a>
+            </div>
+        </div>
+
+        <!-- Educational History -->
+        <div class="shadow-lg border-0 mb-6 bg-white rounded-lg">
+            <div class="p-6">
+                <h2 class="text-xl flex items-center font-semibold">
+                    <i data-lucide="graduation-cap" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                    Educational History
+                </h2>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-700">
+                {% for record in educational_history.records %}
+                    <div class="border rounded-lg p-4 bg-gray-50">
+                        <h4 class="font-semibold text-gray-900 mb-2">Institution {{ forloop.counter }}: {{ record.institution }}</h4>
+                        <p><strong>Diploma/Degree:</strong> {{ record.diploma_degree }}</p>
+                        <p><strong>Period:</strong> {{ record.from_month }} {{ record.from_year }} - {% if record.currently_enrolled %}Currently Enrolled{% else %}{{ record.to_month }} {{ record.to_year }}{% endif %}</p>
+                    </div>
+                {% endfor %}
+                <p><strong>Transcript Instructions:</strong> {{ educational_history.transcript_instructions }}</p>
+                <a href="/apply2/" class="inline-block px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">Edit</a>
+            </div>
+        </div>
+
+        <!-- Work Experience -->
+        <div class="shadow-lg border-0 mb-6 bg-white rounded-lg">
+            <div class="p-6">
+                <h2 class="text-xl flex items-center font-semibold">
+                    <i data-lucide="briefcase" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                    Work Experience
+                </h2>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-700">
+                {% if work_experience.has_no_experience %}
+                    <p>No work experience reported in the past 5 years.</p>
+                {% else %}
+                    {% for record in work_experience.records %}
+                        <div class="border rounded-lg p-4 bg-gray-50">
+                            <h4 class="font-semibold text-gray-900 mb-2">Position {{ forloop.counter }}: {{ record.position }} at {{ record.employer }}</h4>
+                            <p><strong>Period:</strong> {{ record.from_month }} {{ record.from_year }} - {% if record.current_position %}Current{% else %}{{ record.to_month }} {{ record.to_year }}{% endif %}</p>
+                            <p><strong>Responsibilities:</strong> {{ record.responsibilities }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <a href="/apply/3/" class="inline-block px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">Edit</a>
+            </div>
+        </div>
+
+        <!-- Professional Credentials -->
+        <div class="shadow-lg border-0 mb-6 bg-white rounded-lg">
+            <div class="p-6">
+                <h2 class="text-xl flex items-center font-semibold">
+                    <i data-lucide="award" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                    Professional Credentials
+                </h2>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-700">
+                {% if professional_credentials.has_no_credentials %}
+                    <p>No professional credentials or licenses reported.</p>
+                {% else %}
+                    {% for record in professional_credentials.credentials %}
+                        <div class="border rounded-lg p-4 bg-gray-50">
+                            <h4 class="font-semibold text-gray-900 mb-2">Credential {{ forloop.counter }}: {{ record.credential_name }}</h4>
+                            <p><strong>Issuing Organization:</strong> {{ record.issuing_organization }}</p>
+                            <p><strong>Issue Date:</strong> {{ record.issue_date }}</p>
+                            {% if record.expiry_date %}
+                                <p><strong>Expiry Date:</strong> {{ record.expiry_date }}</p>
+                            {% endif %}
+                            {% if record.credential_number %}
+                                <p><strong>Credential Number:</strong> {{ record.credential_number }}</p>
+                            {% endif %}
+                            <p><strong>Document:</strong> {{ record.file_name }} <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ record.upload_status }}</span></p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <a href="/apply/4/" class="inline-block px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">Edit</a>
+            </div>
+        </div>
+
+        <!-- Next of Kin -->
+        <div class="shadow-lg border-0 mb-6 bg-white rounded-lg">
+            <div class="p-6">
+                <h2 class="text-xl flex items-center font-semibold">
+                    <i data-lucide="users" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                    Next of Kin / Emergency Contact
+                </h2>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-700">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><strong>Full Name:</strong> {{ next_of_kin.first_name }} {{ next_of_kin.middle_name }} {{ next_of_kin.surname }}</div>
+                    <div><strong>Relationship:</strong> {{ next_of_kin.relationship|capfirst }}</div>
+                    <div><strong>Primary Phone:</strong> {{ next_of_kin.phone_number }}</div>
+                    {% if next_of_kin.alternate_phone_number %}
+                        <div><strong>Alternate Phone:</strong> {{ next_of_kin.alternate_phone_number }}</div>
+                    {% endif %}
+                    {% if next_of_kin.email %}
+                        <div><strong>Email:</strong> {{ next_of_kin.email }}</div>
+                    {% endif %}
+                    {% if next_of_kin.occupation %}
+                        <div><strong>Occupation:</strong> {{ next_of_kin.occupation }}</div>
+                    {% endif %}
+                </div>
+                <div class="space-y-2">
+                    <div><strong>Address:</strong> {{ next_of_kin.address }}</div>
+                    {% if next_of_kin.work_address %}
+                        <div><strong>Work Address:</strong> {{ next_of_kin.work_address }}</div>
+                    {% endif %}
+                </div>
+                <a href="/apply/5/" class="inline-block px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">Edit</a>
+            </div>
+        </div>
+
+        <!-- References -->
+        <div class="shadow-lg border-0 mb-6 bg-white rounded-lg">
+            <div class="p-6">
+                <h2 class="text-xl flex items-center font-semibold">
+                    <i data-lucide="user-check" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                    Academic & Professional References
+                </h2>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-700">
+                {% for ref in references.references %}
+                    <div class="border rounded-lg p-4 bg-gray-50">
+                        <h4 class="font-semibold text-gray-900 mb-2">Reference {{ forloop.counter }}: {{ ref.name }}</h4>
+                        <p><strong>Position/Rank:</strong> {{ ref.position_rank }}</p>
+                        <p><strong>Relationship:</strong> {{ ref.relationship_type }}{% if ref.is_undergraduate_teacher %} <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Undergraduate Teacher</span>{% endif %}</p>
+                        <p><strong>Institution/Organization:</strong> {{ ref.institution_organization }}</p>
+                        <p><strong>Years Known:</strong> {{ ref.years_known }} years</p>
+                        <p><strong>Address:</strong> {{ ref.address }}</p>
+                        <p><strong>Phone:</strong> {{ ref.phone_number }}</p>
+                        <p><strong>Email:</strong> {{ ref.email }}</p>
+                    </div>
+                {% endfor %}
+                <a href="/apply/6/" class="inline-block px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">Edit</a>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="shadow-lg border-0 mb-6 bg-white rounded-lg">
+            <div class="p-6">
+                <h2 class="text-xl flex items-center font-semibold">
+                    <i data-lucide="info" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                    Additional Information
+                </h2>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-700">
+                {% if additional_information.additional_info %}
+                    <div class="space-y-2">
+                        <p class="font-semibold">Other Relevant Information:</p>
+                        <p class="whitespace-pre-wrap">{{ additional_information.additional_info }}</p>
+                    </div>
+                {% else %}
+                    <p>No additional information provided.</p>
+                {% endif %}
+                <h4 class="font-semibold text-gray-900 mt-4 mb-2 flex items-center gap-2">
+                    <i data-lucide="award" class="h-4 w-4"></i>
+                    Honors & Awards ({{ additional_information.honors|length }})
+                </h4>
+                {% if additional_information.honors %}
+                    <div class="space-y-3">
+                        {% for honor in additional_information.honors %}
+                            <div class="border rounded-lg p-3 bg-gray-50">
+                                <div class="flex items-center gap-2 mb-1">
+                                    {% if "scholarship" in honor.title|lower or "academic" in honor.title|lower %}
+                                        <i data-lucide="star" class="h-4 w-4 text-yellow-500"></i>
+                                    {% elif "award" in honor.title|lower or "prize" in honor.title|lower %}
+                                        <i data-lucide="trophy" class="h-4 w-4 text-amber-500"></i>
+                                    {% elif "medal" in honor.title|lower or "honor" in honor.title|lower %}
+                                        <i data-lucide="medal" class="h-4 w-4 text-gray-500"></i>
+                                    {% else %}
+                                        <i data-lucide="award" class="h-4 w-4 text-blue-500"></i>
+                                    {% endif %}
+                                    <p class="font-medium text-gray-900">{{ honor.title }}</p>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ml-auto">
+                                        <i data-lucide="calendar" class="h-3 w-3 mr-1"></i>
+                                        {{ honor.year }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500">{{ honor.organization }}</p>
+                                {% if honor.description %}<p class="text-xs text-gray-600">{{ honor.description }}</p>{% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No honors or awards listed.</p>
+                {% endif %}
+                <a href="/apply/7/" class="inline-block px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">Edit</a>
+            </div>
+        </div>
+
+        <!-- Document Uploads -->
+        <div class="shadow-lg border-0 mb-6 bg-white rounded-lg">
+            <div class="p-6">
+                <h2 class="text-xl flex items-center font-semibold">
+                    <i data-lucide="file-text" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                    Uploaded Documents
+                </h2>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-gray-700">
+                {% for category in document_categories %}
+                    <div class="border rounded-lg p-4 bg-gray-50">
+                        <h4 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                            {{ category.title }}
+                            {% if category.required %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Required</span>
+                            {% endif %}
+                        </h4>
+                        {% if category.files %}
+                            <div class="space-y-2">
+                                {% for file in category.files %}
+                                    <div class="flex items-center justify-between p-2 bg-white rounded-md border">
+                                        <div class="flex items-center space-x-2">
+                                            {% if file.name|slice:"-3:"|lower in "jpg,jpeg,png,gif" %}
+                                                <img src="{% static 'placeholder.svg' %}" alt="Image" class="h-4 w-4">
+                                            {% else %}
+                                                <i data-lucide="file-text" class="h-4 w-4"></i>
+                                            {% endif %}
+                                            <div>
+                                                <p class="font-medium">{{ file.name }}</p>
+                                                <p class="text-xs text-gray-500">{{ file.size|filesizeformat }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            {% if file.status == "completed" %}<i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>{% endif %}
+                                            {% if file.url %}<a href="{{ file.url }}" target="_blank" class="p-1 hover:bg-gray-100 rounded"><i data-lucide="eye" class="h-4 w-4 text-blue-500"></i></a>{% endif %}
+                                            <a href="#" class="p-1 hover:bg-gray-100 rounded" onclick="alert('Simulating download for {{ file.name }}'); return false;"><i data-lucide="download" class="h-4 w-4"></i></a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-gray-500">No files uploaded for this category.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <a href="/apply/8/" class="inline-block px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">Edit</a>
+            </div>
+        </div>
+
+        <!-- Final Submission -->
+        <div class="shadow-lg border-0 mb-6 bg-white rounded-lg">
+            <div class="p-6">
+                <h2 class="text-xl flex items-center font-semibold">
+                    <i data-lucide="alert-circle" class="h-5 w-5 mr-2 text-red-600"></i>
+                    Final Submission
+                </h2>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Important!</strong>
+                    <span class="block sm:inline">
+                        By clicking "Submit Application", you certify that all information provided in this application is true, complete, and accurate to the best of your knowledge. False statements may result in denial of admission or dismissal from the University.
+                    </span>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <a href="/apply/dashboard/" class="inline-block flex-1 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md text-center">
+                        <i data-lucide="arrow-left" class="h-4 w-4 mr-2 inline"></i>
+                        Back to Previous Step
+                    </a>
+                    {% comment %} <!-- <form method="post" action="{% url 'submit_application' %}"> -->{% endcomment %}
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <button type="submit" class="flex-1 px-4 py-2 bg-[#722F37] hover:bg-[#5a252a] text-white rounded-md text-center" {% if is_submitting %}disabled{% endif %}>
+                            {% if is_submitting %}
+                                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
+                                Submitting...
+                            {% else %}
+                                <i data-lucide="check-circle" class="h-4 w-4 mr-2 inline"></i>
+                                Submit Application
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                <p>&copy; 2025 School of Postgraduate Achievers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'common',
+    'application',
 ]
 
 MIDDLEWARE = [
@@ -100,7 +102,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'app.CustomUser'
+AUTH_USER_MODEL = 'common.CustomUser'
 
 
 # Internationalization

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next of Kin / Emergency Contact</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-[#722F37]">SPA</h1>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-lg font-medium text-gray-700">Application Form</h2>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="bell" class="h-4 w-4"></i>
+                    </button>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="settings" class="h-4 w-4"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span class="text-sm font-medium text-gray-700">John Doe</span>
+                    </div>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-700">Application Progress</h3>
+                <span class="text-sm text-gray-500">Step 5 of 5</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 100%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Next of Kin / Emergency Contact</h1>
+            <p class="text-gray-600">
+                Provide details of a person the University may contact in case of emergency.
+            </p>
+        </div>
+
+        <!-- Important Notice -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+            <div class="flex items-start">
+                <i data-lucide="alert-circle" class="h-5 w-5 text-red-500 mr-3 mt-0.5"></i>
+                <div>
+                    <h4 class="font-medium text-red-800 mb-1">Important Information</h4>
+                    <p class="text-sm text-red-700">
+                        This person will be contacted by the University in case of emergency. Please ensure all contact 
+                        information is accurate and up-to-date. Notify the University immediately if any of these details change.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" action="/apply/5/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="bg-white shadow-lg border-0 rounded-lg">
+                <div class="p-6 space-y-6">
+                    <!-- Personal Details -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 flex items-center">
+                            <i data-lucide="user" class="h-4 w-4 mr-2"></i>
+                            Personal Details
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="space-y-2">
+                                <label for="surname" class="text-sm font-medium text-gray-700">
+                                    Surname <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="surname" name="surname" class="w-full border-gray-300 rounded-md" value="{{ next_of_kin.surname|default:'' }}" placeholder="Enter surname">
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if 'surname' in message.tags %}
+                                            <p class="text-sm text-red-600">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="space-y-2">
+                                <label for="first_name" class="text-sm font-medium text-gray-700">
+                                    First Name <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="first_name" name="first_name" class="w-full border-gray-300 rounded-md" value="{{ next_of_kin.first_name|default:'' }}" placeholder="Enter first name">
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if 'first name' in message.tags %}
+                                            <p class="text-sm text-red-600">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="space-y-2">
+                                <label for="middle_name" class="text-sm font-medium text-gray-700">
+                                    Middle Name
+                                </label>
+                                <input type="text" id="middle_name" name="middle_name" class="w-full border-gray-300 rounded-md" value="{{ next_of_kin.middle_name|default:'' }}" placeholder="Enter middle name (optional)">
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="relationship" class="text-sm font-medium text-gray-700">
+                                Relationship to You <span class="text-red-500">*</span>
+                            </label>
+                            <select id="relationship" name="relationship" class="w-full border-gray-300 rounded-md">
+                                <option value="">Select relationship</option>
+                                {% for rel in nok %}
+                                    <option value="{{ rel }}" {% if next_of_kin.relationship == rel %}selected{% endif %}>{{ rel }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {% if 'relationship' in message.tags %}
+                                        <p class="text-sm text-red-600">{{ message }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 flex items-center">
+                            <i data-lucide="map-pin" class="h-4 w-4 mr-2"></i>
+                            Contact Information
+                        </h3>
+                        <div class="space-y-2">
+                            <label for="address" class="text-sm font-medium text-gray-700">
+                                Complete Address <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="address" name="address" class="w-full border-gray-300 rounded-md" rows="3" placeholder="Enter complete residential address including street, city, state, and postal code">{{ next_of_kin.address|default:'' }}</textarea>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {% if 'address' in message.tags %}
+                                        <p class="text-sm text-red-600">{{ message }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="phone_number" class="text-sm font-medium text-gray-700">
+                                    Primary Phone Number <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="phone_number" name="phone_number" class="w-full border-gray-300 rounded-md" value="{{ next_of_kin.phone_number|default:'' }}" placeholder="Enter primary phone number">
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if 'phone number' in message.tags %}
+                                            <p class="text-sm text-red-600">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="space-y-2">
+                                <label for="alternate_phone_number" class="text-sm font-medium text-gray-700">
+                                    Alternate Phone Number
+                                </label>
+                                <input type="text" id="alternate_phone_number" name="alternate_phone_number" class="w-full border-gray-300 rounded-md" value="{{ next_of_kin.alternate_phone_number|default:'' }}" placeholder="Enter alternate phone number (optional)">
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if 'alternate phone number' in message.tags %}
+                                            <p class="text-sm text-red-600">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="email" class="text-sm font-medium text-gray-700">
+                                Email Address <span class="text-gray-500">(optional)</span>
+                            </label>
+                            <input type="email" id="email" name="email" class="w-full border-gray-300 rounded-md" value="{{ next_of_kin.email|default:'' }}" placeholder="Enter email address (optional)">
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {% if 'email' in message.tags %}
+                                        <p class="text-sm text-red-600">{{ message }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 flex items-center">
+                            <i data-lucide="heart" class="h-4 w-4 mr-2"></i>
+                            Additional Information <span class="text-sm font-normal text-gray-500">(Optional)</span>
+                        </h3>
+                        <div class="space-y-2">
+                            <label for="occupation" class="text-sm font-medium text-gray-700">
+                                Occupation
+                            </label>
+                            <input type="text" id="occupation" name="occupation" class="w-full border-gray-300 rounded-md" value="{{ next_of_kin.occupation|default:'' }}" placeholder="Enter occupation (optional)">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="work_address" class="text-sm font-medium text-gray-700">
+                                Work Address
+                            </label>
+                            <textarea id="work_address" name="work_address" class="w-full border-gray-300 rounded-md" rows="2" placeholder="Enter work address (optional)">{{ next_of_kin.work_address|default:'' }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <i data-lucide="alert-circle" class="h-5 w-5 text-blue-500 mr-3 mt-0.5"></i>
+                            <div>
+                                <h4 class="font-medium text-blue-800 mb-1">Confirmation</h4>
+                                <p class="text-sm text-blue-700">
+                                    By providing this information, you confirm that the person listed above has consented to be 
+                                    contacted by the University in case of emergency and that all information provided is accurate.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t">
+                        <button type="button" onclick="window.history.back()" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                            Previous Step
+                        </button>
+                        <div class="flex gap-3 sm:ml-auto">
+                            <!-- <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                                Save Draft
+                            </button> -->
+                            <button type="submit" name="action" value="next" class="bg-[#722F37] hover:bg-[#5a252a] text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
+                                Complete Application
+                                <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                <p>&copy; 2024 School of Postgraduate Achievers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

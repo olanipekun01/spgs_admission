@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Additional Information</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-[#722F37]">SPA</h1>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-lg font-medium text-gray-700">Application Form</h2>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="bell" class="h-4 w-4"></i>
+                    </button>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="settings" class="h-4 w-4"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span class="text-sm font-medium text-gray-700">John Doe</span>
+                    </div>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-700">Application Progress</h3>
+                <span class="text-sm text-gray-500">Step 5 of 6</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 83%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Additional Information</h1>
+            <p class="text-gray-600">Provide details to enhance your application profile.</p>
+        </div>
+
+        <form method="post" action="/apply/7/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Additional Information Section -->
+            <div class="bg-white shadow-lg border-0 rounded-lg mb-8">
+                <div class="p-6 space-y-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="info" class="h-5 w-5 text-blue-600"></i>
+                        <h2 class="text-xl font-semibold text-gray-900">Additional Information</h2>
+                    </div>
+                    <p class="text-gray-600">
+                        Provide any other information you consider relevant to this application. This could include 
+                        research interests, publications, volunteer work, leadership experience, special skills, 
+                        or any other achievements that support your application.
+                    </p>
+                    <div>
+                        <label for="additional-info" class="text-base font-medium text-gray-700">
+                            Additional Information
+                        </label>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Use this space to highlight any relevant information not covered in other sections
+                        </p>
+                        <textarea
+                            id="additional-info"
+                            name="additional_info"
+                            class="w-full border-gray-300 rounded-md min-h-[200px] resize-y"
+                            placeholder="Examples:
+• Research experience and publications
+• Leadership roles and responsibilities  
+• Volunteer work and community service
+• Special skills and certifications
+• Relevant projects or achievements
+• Career goals and aspirations
+• Any challenges overcome
+• Other relevant experiences..."
+                            maxlength="2000"
+                        >{{ additional_info.additional_info|default:'' }}</textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <p class="text-sm text-gray-500">Maximum 2000 characters</p>
+                            <p class="text-sm text-gray-500">{{ additional_info.additional_info|length }}/2000</p>
+                        </div>
+                        {% if messages %}
+                            {% for message in messages %}
+                                {% if 'additional_info' in message.message.lower %}
+                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Honors and Awards Section -->
+            <div class="bg-white shadow-lg border-0 rounded-lg mb-8">
+                <div class="p-6 space-y-6">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="award" class="h-5 w-5 text-yellow-600"></i>
+                        <h2 class="text-xl font-semibold text-gray-900">Honors and Awards</h2>
+                    </div>
+                    <p class="text-gray-600">
+                        List any honors, awards, scholarships, or recognitions you have received. 
+                        Include academic achievements, professional recognitions, and other notable accomplishments.
+                    </p>
+
+                    <!-- Existing Honors List -->
+                    {% if honors %}
+                        <div class="space-y-4">
+                            <h4 class="font-medium text-gray-900 flex items-center gap-2">
+                                <i data-lucide="trophy" class="h-4 w-4"></i>
+                                Your Honors & Awards ({{ honors|length }})
+                            </h4>
+                            {% for honor in honors %}
+                                <div class="border rounded-lg p-4 bg-gray-50">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                {% if 'scholarship' in honor.title.lower or 'academic' in honor.title.lower %}
+                                                    <i data-lucide="star" class="h-4 w-4 text-yellow-500"></i>
+                                                {% elif 'award' in honor.title.lower or 'prize' in honor.title.lower %}
+                                                    <i data-lucide="trophy" class="h-4 w-4 text-yellow-600"></i>
+                                                {% elif 'medal' in honor.title.lower or 'honor' in honor.title.lower %}
+                                                    <i data-lucide="medal" class="h-4 w-4 text-bronze-500"></i>
+                                                {% else %}
+                                                    <i data-lucide="award" class="h-4 w-4 text-blue-500"></i>
+                                                {% endif %}
+                                                <h5 class="font-semibold text-gray-900">{{ honor.title }}</h5>
+                                                <span class="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                    <i data-lucide="calendar" class="h-3 w-3 mr-1"></i>
+                                                    {{ honor.year }}
+                                                </span>
+                                            </div>
+                                            <p class="text-sm text-gray-700 font-medium mb-1">{{ honor.organization }}</p>
+                                            {% if honor.description %}
+                                                <p class="text-sm text-gray-600">{{ honor.description }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded"
+                                            onclick="this.parentElement.parentElement.remove()"
+                                        >
+                                            <i data-lucide="x" class="h-4 w-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Add Honor Form -->
+                    <div class="border rounded-lg p-4 bg-blue-50 border-blue-200" id="honor-form" style="display: none;">
+                        <h4 class="font-medium text-gray-900 mb-4 flex items-center gap-2">
+                            <i data-lucide="plus" class="h-4 w-4"></i>
+                            Add Honor/Award
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="honor-title-0" class="text-sm font-medium text-gray-700">
+                                    Title/Name of Honor or Award *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="honor-title-0"
+                                    name="honors[0][title]"
+                                    class="w-full border-gray-300 rounded-md mt-1"
+                                    placeholder="e.g., Dean's List, Academic Excellence Award"
+                                >
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if 'title' in message.message.lower and '0' in message.message.lower %}
+                                            <p class="text-sm text-red-600 mt-1">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label for="honor-organization-0" class="text-sm font-medium text-gray-700">
+                                    Organization/Institution *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="honor-organization-0"
+                                    name="honors[0][organization]"
+                                    class="w-full border-gray-300 rounded-md mt-1"
+                                    placeholder="e.g., University of Lagos, IEEE"
+                                >
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if 'organization' in message.message.lower and '0' in message.message.lower %}
+                                            <p class="text-sm text-red-600 mt-1">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label for="honor-year-0" class="text-sm font-medium text-gray-700">
+                                    Year Received *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="honor-year-0"
+                                    name="honors[0][year]"
+                                    class="w-full border-gray-300 rounded-md mt-1"
+                                    placeholder="e.g., 2023"
+                                    maxlength="4"
+                                >
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if 'year' in message.message.lower and '0' in message.message.lower %}
+                                            <p class="text-sm text-red-600 mt-1">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label for="honor-description-0" class="text-sm font-medium text-gray-700">
+                                    Description (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    id="honor-description-0"
+                                    name="honors[0][description]"
+                                    class="w-full border-gray-300 rounded-md mt-1"
+                                    placeholder="Brief description or criteria"
+                                >
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button type="button" onclick="addHonor()" class="bg-blue-600 text-white px-4 py-2 rounded-md">
+                                <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                                Add Honor/Award
+                            </button>
+                            <button type="button" onclick="cancelHonor()" class="border border-gray-300 text-gray-700 px-4 py-2 rounded-md">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Add Honor Button -->
+                    <button
+                        type="button"
+                        class="w-full border-dashed border-2 border-gray-300 hover:border-gray-400 py-8 rounded-md"
+                        onclick="document.getElementById('honor-form').style.display='block'"
+                    >
+                        <i data-lucide="plus" class="h-5 w-5 mr-2"></i>
+                        Add Honor or Award
+                    </button>
+
+                    <!-- Examples Section -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                            <i data-lucide="info" class="h-4 w-4 text-blue-500"></i>
+                            Examples of Honors & Awards
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                            <div>
+                                <p class="font-medium text-gray-700 mb-1">Academic:</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Dean's List</li>
+                                    <li>Academic Excellence Award</li>
+                                    <li>Scholarship recipient</li>
+                                    <li>Magna Cum Laude</li>
+                                    <li>Best Student Award</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700 mb-1">Professional:</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Professional certifications</li>
+                                    <li>Industry recognition</li>
+                                    <li>Research grants</li>
+                                    <li>Publication awards</li>
+                                    <li>Leadership awards</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                <button type="button" onclick="window.history.back()" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                    Previous: References
+                </button>
+                <div class="flex gap-3 sm:ml-auto">
+                    <!-- <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                        Save Draft
+                    </button> -->
+                    <button type="submit" name="action" value="next" class="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
+                        Continue to Review
+                        <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                <p>&copy; 2024 School of Postgraduate Achievers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+
+            function addHonor() {
+                document.getElementById('honor-form').style.display = 'none';
+                // Submit form to save honor (handled by Django view)
+                document.querySelector('form').submit();
+            }
+
+            function cancelHonor() {
+                document.getElementById('honor-form').style.display = 'none';
+                // Clear inputs if needed
+                document.getElementById('honor-title-0').value = '';
+                document.getElementById('honor-organization-0').value = '';
+                document.getElementById('honor-year-0').value = '';
+                document.getElementById('honor-description-0').value = '';
+            }
+        });
+    </script>
+</body>
+</html>

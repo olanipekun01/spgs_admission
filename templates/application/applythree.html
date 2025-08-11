@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+
+            const form = document.getElementById('workExperienceForm');
+            const noExperienceCheckbox = document.getElementById('no-experience');
+            const recordsContainer = document.getElementById('workExperienceRecords');
+            const addRecordButton = document.getElementById('add-record');
+
+            // Sync initial state
+            noExperienceCheckbox.addEventListener('change', function() {
+                recordsContainer.style.display = this.checked ? 'none' : 'block';
+                if (this.checked) {
+                    recordsContainer.innerHTML = '';
+                } else if (!recordsContainer.children.length) {
+                    addRecord();
+                }
+            });
+
+            // Add new record
+            addRecordButton.addEventListener('click', function() {
+                addRecord();
+            });
+
+            // Remove record
+            recordsContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-record')) {
+                    e.target.closest('.record-item').remove();
+                    updateRecordIndices();
+                }
+            });
+
+            function addRecord() {
+                const recordIndex = recordsContainer.children.length;
+                const recordHtml = `
+                    <div class="record-item border rounded-lg p-6 bg-gray-50" data-record-index="${recordIndex}">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i data-lucide="building" class="h-4 w-4 mr-2"></i>
+                                Position ${recordIndex + 1}
+                            </h3>
+                            <button type="button" class="remove-record text-red-600 hover:text-red-700 hover:bg-red-50 inline-flex items-center justify-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md">
+                                <i data-lucide="trash-2" class="h-4 w-4 mr-1"></i>
+                                Remove
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label for="records[${recordIndex}][position]" class="text-sm font-medium text-gray-700">
+                                        Position/Job Title <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                        <input type="text" id="records[${recordIndex}][position]" name="records[${recordIndex}][position]" class="pl-10 w-full border-gray-300 rounded-md" placeholder="e.g., Software Engineer, Marketing Manager">
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="position"></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label for="records[${recordIndex}][employer]" class="text-sm font-medium text-gray-700">
+                                        Employer/Company <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                        <input type="text" id="records[${recordIndex}][employer]" name="records[${recordIndex}][employer]" class="pl-10 w-full border-gray-300 rounded-md" placeholder="Enter company/organization name">
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="employer"></p>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="calendar" class="h-4 w-4 text-gray-500"></i>
+                                    <label class="text-sm font-medium text-gray-700">Employment Period</label>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-700">From <span class="text-red-500">*</span></label>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <select name="records[${recordIndex}][fromMonth]" class="w-full border-gray-300 rounded-md">
+                                                <option value="">Month</option>
+                                                {% for month in months %}
+                                                <option value="{{ month }}">{{ month }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <select name="records[${recordIndex}][fromYear]" class="w-full border-gray-300 rounded-md">
+                                                <option value="">Year</option>
+                                                {% for year in years %}
+                                                <option value="{{ year }}">{{ year }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <p class="error text-sm text-red-600 hidden" data-error="fromMonth"></p>
+                                        <p class="error text-sm text-red-600 hidden" data-error="fromYear"></p>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-700">To <span class="text-red-500">*</span></label>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center space-x-2">
+                                                <input type="checkbox" name="records[${recordIndex}][currentPosition]" id="records[${recordIndex}][currentPosition]" class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded">
+                                                <label for="records[${recordIndex}][currentPosition]" class="text-sm text-gray-700">Current position</label>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-2" data-to-date-container>
+                                                <select name="records[${recordIndex}][toMonth]" class="w-full border-gray-300 rounded-md">
+                                                    <option value="">Month</option>
+                                                    {% for month in months %}
+                                                    <option value="{{ month }}">{{ month }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <select name="records[${recordIndex}][toYear]" class="w-full border-gray-300 rounded-md">
+                                                    <option value="">Year</option>
+                                                    {% for year in years %}
+                                                    <option value="{{ year }}">{{ year }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <p class="error text-sm text-red-600 hidden" data-error="toMonth"></p>
+                                        <p class="error text-sm text-red-600 hidden" data-error="toYear"></p>
+                                        <p class="error text-sm text-red-600 hidden" data-error="dateRange"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="records[${recordIndex}][responsibilities]" class="text-sm font-medium text-gray-700">
+                                    Key Responsibilities and Achievements <span class="text-red-500">*</span>
+                                </label>
+                                <textarea id="records[${recordIndex}][responsibilities]" name="records[${recordIndex}][responsibilities]" class="w-full border-gray-300 rounded-md" placeholder="Describe your main responsibilities, achievements, and key contributions in this role..." rows="4"></textarea>
+                                <p class="error text-sm text-red-600 hidden" data-error="responsibilities"></p>
+                                <p class="text-xs text-gray-500">Include specific achievements, skills developed, and impact made in this position.</p>
+                            </div>
+                        </div>
+                        <input type="hidden" name="records[${recordIndex}][id]" value="">
+                    </div>
+                `;
+                recordsContainer.insertAdjacentHTML('beforeend', recordHtml);
+                lucide.createIcons();
+                updateToDateVisibility(recordIndex);
+            }
+
+            function updateRecordIndices() {
+                const records = recordsContainer.getElementsByClassName('record-item');
+                Array.from(records).forEach((record, index) => {
+                    record.setAttribute('data-record-index', index);
+                    const inputs = record.getElementsByTagName('input');
+                    const selects = record.getElementsByTagName('select');
+                    const textareas = record.getElementsByTagName('textarea');
+                    for (let input of inputs) {
+                        if (input.name) input.name = input.name.replace(/\[\d+\]/, `[${index}]`);
+                        if (input.id) input.id = input.id.replace(/\[\d+\]/, `[${index}]`);
+                    }
+                    for (let select of selects) {
+                        if (select.name) select.name = select.name.replace(/\[\d+\]/, `[${index}]`);
+                        if (select.id) select.id = select.id.replace(/\[\d+\]/, `[${index}]`);
+                    }
+                    for (let textarea of textareas) {
+                        if (textarea.name) textarea.name = textarea.name.replace(/\[\d+\]/, `[${index}]`);
+                        if (textarea.id) textarea.id = textarea.id.replace(/\[\d+\]/, `[${index}]`);
+                    }
+                    const h3 = record.querySelector('h3');
+                    if (h3) h3.textContent = `Position ${index + 1}` + (h3.textContent.match(/Current/) ? ' Current' : '');
+                });
+            }
+
+            function updateToDateVisibility(index) {
+                const currentCheckbox = document.getElementById(`records[${index}][currentPosition]`);
+                const toDateContainer = document.querySelector(`[data-record-index="${index}"] [data-to-date-container]`);
+                if (currentCheckbox && toDateContainer) {
+                    toDateContainer.style.display = currentCheckbox.checked ? 'none' : 'grid';
+                    currentCheckbox.addEventListener('change', function() {
+                        toDateContainer.style.display = this.checked ? 'none' : 'grid';
+                    });
+                }
+            }
+
+            // Initialize existing records
+            {% for record in work_records %}
+            const existingRecordHtml = `
+                <div class="record-item border rounded-lg p-6 bg-gray-50" data-record-index="{{ forloop.counter0 }}">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i data-lucide="building" class="h-4 w-4 mr-2"></i>
+                            Position {{ forloop.counter }}
+                            {% if record.current_position %}
+                            <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Current</span>
+                            {% endif %}
+                        </h3>
+                        <button type="button" class="remove-record text-red-600 hover:text-red-700 hover:bg-red-50 inline-flex items-center justify-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md">
+                            <i data-lucide="trash-2" class="h-4 w-4 mr-1"></i>
+                            Remove
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="records[{{ forloop.counter0 }}][position]" class="text-sm font-medium text-gray-700">
+                                    Position/Job Title <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                    <input type="text" id="records[{{ forloop.counter0 }}][position]" name="records[{{ forloop.counter0 }}][position]" value="{{ record.position }}" class="pl-10 w-full border-gray-300 rounded-md" placeholder="e.g., Software Engineer, Marketing Manager">
+                                </div>
+                                <p class="error text-sm text-red-600 hidden" data-error="position"></p>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="records[{{ forloop.counter0 }}][employer]" class="text-sm font-medium text-gray-700">
+                                    Employer/Company <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                    <input type="text" id="records[{{ forloop.counter0 }}][employer]" name="records[{{ forloop.counter0 }}][employer]" value="{{ record.employer }}" class="pl-10 w-full border-gray-300 rounded-md" placeholder="Enter company/organization name">
+                                </div>
+                                <p class="error text-sm text-red-600 hidden" data-error="employer"></p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="calendar" class="h-4 w-4 text-gray-500"></i>
+                                <label class="text-sm font-medium text-gray-700">Employment Period</label>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">From <span class="text-red-500">*</span></label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <select name="records[{{ forloop.counter0 }}][fromMonth]" class="w-full border-gray-300 rounded-md">
+                                            <option value="">Month</option>
+                                            {% for month in months %}
+                                            <option value="{{ month }}" {% if record.from_month == month %}selected{% endif %}>{{ month }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select name="records[{{ forloop.counter0 }}][fromYear]" class="w-full border-gray-300 rounded-md">
+                                            <option value="">Year</option>
+                                            {% for year in years %}
+                                            <option value="{{ year }}" {% if record.from_year == year %}selected{% endif %}>{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="fromMonth"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="fromYear"></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">To {% if not record.current_position %}<span class="text-red-500">*</span>{% endif %}</label>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-2">
+                                            <input type="checkbox" name="records[{{ forloop.counter0 }}][currentPosition]" id="records[{{ forloop.counter0 }}][currentPosition]" {% if record.current_position %}checked{% endif %} class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded">
+                                            <label for="records[{{ forloop.counter0 }}][currentPosition]" class="text-sm text-gray-700">Current position</label>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2" data-to-date-container {% if record.current_position %}style="display: none;"{% endif %}>
+                                            <select name="records[{{ forloop.counter0 }}][toMonth]" class="w-full border-gray-300 rounded-md">
+                                                <option value="">Month</option>
+                                                {% for month in months %}
+                                                <option value="{{ month }}" {% if record.to_month == month %}selected{% endif %}>{{ month }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <select name="records[{{ forloop.counter0 }}][toYear]" class="w-full border-gray-300 rounded-md">
+                                                <option value="">Year</option>
+                                                {% for year in years %}
+                                                <option value="{{ year }}" {% if record.to_year == year %}selected{% endif %}>{{ year }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="toMonth"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="toYear"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="dateRange"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="records[{{ forloop.counter0 }}][responsibilities]" class="text-sm font-medium text-gray-700">
+                                Key Responsibilities and Achievements <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="records[{{ forloop.counter0 }}][responsibilities]" name="records[{{ forloop.counter0 }}][responsibilities]" class="w-full border-gray-300 rounded-md" placeholder="Describe your main responsibilities, achievements, and key contributions in this role..." rows="4">{{ record.responsibilities }}</textarea>
+                            <p class="error text-sm text-red-600 hidden" data-error="responsibilities"></p>
+                            <p class="text-xs text-gray-500">Include specific achievements, skills developed, and impact made in this position.</p>
+                        </div>
+                    </div>
+                    <input type="hidden" name="records[{{ forloop.counter0 }}][id]" value="{{ record.id }}">
+                </div>
+                `;
+                recordsContainer.insertAdjacentHTML('beforeend', existingRecordHtml);
+                lucide.createIcons();
+                updateToDateVisibility({{ forloop.counter0 }});
+            {% endfor %}
+            if (!noExperienceCheckbox.checked && !recordsContainer.children.length) {
+                addRecord();
+            }
+
+            // Form submission validation
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const errors = {};
+                const months = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+                const records = recordsContainer.getElementsByClassName('record-item');
+                if (!noExperienceCheckbox.checked) {
+                    if (!records.length) {
+                        alert('Please add at least one work experience record or check "No Experience".');
+                        return;
+                    }
+                    Array.from(records).forEach((record, index) => {
+                        const position = record.querySelector(`input[name="records[${index}][position]"]`).value.trim();
+                        const employer = record.querySelector(`input[name="records[${index}][employer]"]`).value.trim();
+                        const fromMonth = record.querySelector(`select[name="records[${index}][fromMonth]"]`).value;
+                        const fromYear = record.querySelector(`select[name="records[${index}][fromYear]"]`).value;
+                        const toMonth = record.querySelector(`select[name="records[${index}][toMonth]"]`)?.value;
+                        const toYear = record.querySelector(`select[name="records[${index}][toYear]"]`)?.value;
+                        const currentPosition = record.querySelector(`input[name="records[${index}][currentPosition]"]`).checked;
+                        const responsibilities = record.querySelector(`textarea[name="records[${index}][responsibilities]"]`).value.trim();
+
+                        if (!position) errors[`${index}-position`] = "Position/Job title is required";
+                        if (!employer) errors[`${index}-employer`] = "Employer name is required";
+                        if (!fromMonth) errors[`${index}-fromMonth`] = "Start month is required";
+                        if (!fromYear) errors[`${index}-fromYear`] = "Start year is required";
+                        if (!currentPosition && (!toMonth || !toYear)) {
+                            errors[`${index}-toMonth`] = "End month and year are required";
+                        }
+                        if (!responsibilities) errors[`${index}-responsibilities`] = "Job responsibilities are required";
+
+                        const fromDate = new Date(parseInt(fromYear), months.indexOf(fromMonth));
+                        if (!currentPosition && toMonth && toYear) {
+                            const toDate = new Date(parseInt(toYear), months.indexOf(toMonth));
+                            if (fromDate >= toDate) {
+                                errors[`${index}-dateRange`] = "End date must be after start date";
+                            }
+                        }
+                        const fiveYearsAgo = {{ current_year }} - 5;
+                        if (fromYear && parseInt(fromYear) < fiveYearsAgo) {
+                            errors[`${index}-dateRange`] = "Work experience must be from the past 5 years ({{ current_year|add:'-5' }} onwards)";
+                        }
+                    });
+                }
+
+                if (Object.keys(errors).length > 0) {
+                    for (let [key, message] of Object.entries(errors)) {
+                        const [index, field] = key.split('-');
+                        const errorElement = recordsContainer.querySelector(`[data-record-index="${index}"] [data-error="${field}"]`);
+                        if (errorElement) {
+                            errorElement.textContent = message;
+                            errorElement.classList.remove('hidden');
+                        }
+                    }
+                } else {
+                    form.submit();
+                }
+            });
+
+            // Initialize to-date visibility for existing records
+            {% for record in work_records %}
+            updateToDateVisibility({{ forloop.counter0 }});
+            {% endfor %}
+        });
+    </script>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-[#722F37]">SPA</h1>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-lg font-medium text-gray-700">Application Form</h2>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="bell" class="h-4 w-4"></i>
+                    </button>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="settings" class="h-4 w-4"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span class="text-sm font-medium text-gray-700">John Doe</span>
+                    </div>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-700">Application Progress</h3>
+                <span class="text-sm text-gray-500">Step 3 of 5</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 60%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% for message in messages %}
+            <div class="mb-4 p-4 bg-{% if message.tags == 'error' %}red-100 border-red-400{% else %}green-100 border-green-400{% endif %} text-{% if message.tags == 'error' %}red-700{% else %}green-700{% endif %} rounded-lg">
+                {{ message }}
+            </div>
+        {% endfor %}
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Work Experience</h1>
+            <p class="text-gray-600">
+                List your work appointments in the past five years in reverse chronological order (most recent first).
+            </p>
+        </div>
+
+        <!-- Important Notice -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+            <div class="flex items-start">
+                <i data-lucide="alert-circle" class="h-5 w-5 text-blue-500 mr-3 mt-0.5"></i>
+                <div>
+                    <h4 class="font-medium text-blue-800 mb-1">Instructions</h4>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• Include only work experience from the past 5 years ({{ current_year|add:"-5" }} - {{ current_year }})</li>
+                        <li>• List positions in reverse chronological order (most recent first)</li>
+                        <li>• Include all relevant employment, internships, and volunteer positions</li>
+                        <li>• Provide detailed job responsibilities for each position</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <form id="workExperienceForm" method="post" action="/apply/3/" class="space-y-8">
+            {% csrf_token %}
+            <!-- No Experience Option -->
+            <div class="bg-white shadow-lg border-0 rounded-lg">
+                <div class="p-6">
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" id="no-experience" name="no-experience" {% if has_no_experience %}checked{% endif %} class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded">
+                        <label for="no-experience" class="text-sm font-medium text-gray-700">
+                            I have no work experience in the past 5 years
+                        </label>
+                    </div>
+                    {% if has_no_experience %}
+                    <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-600">
+                            You have indicated that you have no work experience in the past 5 years. You can proceed to the next section.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Work Experience Records -->
+            <div id="workExperienceRecords" class="space-y-8" {% if has_no_experience %}style="display: none;"{% endif %}>
+                {% for record in work_records %}
+                <div class="record-item border rounded-lg p-6 bg-gray-50" data-record-index="{{ forloop.counter0 }}">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i data-lucide="building" class="h-4 w-4 mr-2"></i>
+                            Position {{ forloop.counter }}
+                            {% if record.current_position %}
+                            <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Current</span>
+                            {% endif %}
+                        </h3>
+                        {% if work_records|length > 1 %}
+                        <button type="button" class="remove-record text-red-600 hover:text-red-700 hover:bg-red-50 inline-flex items-center justify-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md">
+                            <i data-lucide="trash-2" class="h-4 w-4 mr-1"></i>
+                            Remove
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="records[{{ forloop.counter0 }}][position]" class="text-sm font-medium text-gray-700">
+                                    Position/Job Title <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                    <input type="text" id="records[{{ forloop.counter0 }}][position]" name="records[{{ forloop.counter0 }}][position]" value="{{ record.position }}" class="pl-10 w-full border-gray-300 rounded-md" placeholder="e.g., Software Engineer, Marketing Manager">
+                                </div>
+                                <p class="error text-sm text-red-600 hidden" data-error="position"></p>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="records[{{ forloop.counter0 }}][employer]" class="text-sm font-medium text-gray-700">
+                                    Employer/Company <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                    <input type="text" id="records[{{ forloop.counter0 }}][employer]" name="records[{{ forloop.counter0 }}][employer]" value="{{ record.employer }}" class="pl-10 w-full border-gray-300 rounded-md" placeholder="Enter company/organization name">
+                                </div>
+                                <p class="error text-sm text-red-600 hidden" data-error="employer"></p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="calendar" class="h-4 w-4 text-gray-500"></i>
+                                <label class="text-sm font-medium text-gray-700">Employment Period</label>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">From <span class="text-red-500">*</span></label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <select name="records[{{ forloop.counter0 }}][fromMonth]" class="w-full border-gray-300 rounded-md">
+                                            <option value="">Month</option>
+                                            {% for month in months %}
+                                            <option value="{{ month }}" {% if record.from_month == month %}selected{% endif %}>{{ month }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select name="records[{{ forloop.counter0 }}][fromYear]" class="w-full border-gray-300 rounded-md">
+                                            <option value="">Year</option>
+                                            {% for year in years %}
+                                            <option value="{{ year }}" {% if record.from_year == year %}selected{% endif %}>{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="fromMonth"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="fromYear"></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">To {% if not record.current_position %}<span class="text-red-500">*</span>{% endif %}</label>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-2">
+                                            <input type="checkbox" name="records[{{ forloop.counter0 }}][currentPosition]" id="records[{{ forloop.counter0 }}][currentPosition]" {% if record.current_position %}checked{% endif %} class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded">
+                                            <label for="records[{{ forloop.counter0 }}][currentPosition]" class="text-sm text-gray-700">Current position</label>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2" data-to-date-container {% if record.current_position %}style="display: none;"{% endif %}>
+                                            <select name="records[{{ forloop.counter0 }}][toMonth]" class="w-full border-gray-300 rounded-md">
+                                                <option value="">Month</option>
+                                                {% for month in months %}
+                                                <option value="{{ month }}" {% if record.to_month == month %}selected{% endif %}>{{ month }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <select name="records[{{ forloop.counter0 }}][toYear]" class="w-full border-gray-300 rounded-md">
+                                                <option value="">Year</option>
+                                                {% for year in years %}
+                                                <option value="{{ year }}" {% if record.to_year == year %}selected{% endif %}>{{ year }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="toMonth"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="toYear"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="dateRange"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="records[{{ forloop.counter0 }}][responsibilities]" class="text-sm font-medium text-gray-700">
+                                Key Responsibilities and Achievements <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="records[{{ forloop.counter0 }}][responsibilities]" name="records[{{ forloop.counter0 }}][responsibilities]" class="w-full border-gray-300 rounded-md" placeholder="Describe your main responsibilities, achievements, and key contributions in this role..." rows="4">{{ record.responsibilities }}</textarea>
+                            <p class="error text-sm text-red-600 hidden" data-error="responsibilities"></p>
+                            <p class="text-xs text-gray-500">Include specific achievements, skills developed, and impact made in this position.</p>
+                        </div>
+                    </div>
+                    <input type="hidden" name="records[{{ forloop.counter0 }}][id]" value="{{ record.id }}">
+                </div>
+                {% empty %}
+                <div class="record-item border rounded-lg p-6 bg-gray-50" data-record-index="0">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i data-lucide="building" class="h-4 w-4 mr-2"></i>
+                            Position 1
+                        </h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="records[0][position]" class="text-sm font-medium text-gray-700">
+                                    Position/Job Title <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                    <input type="text" id="records[0][position]" name="records[0][position]" class="pl-10 w-full border-gray-300 rounded-md" placeholder="e.g., Software Engineer, Marketing Manager">
+                                </div>
+                                <p class="error text-sm text-red-600 hidden" data-error="position"></p>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="records[0][employer]" class="text-sm font-medium text-gray-700">
+                                    Employer/Company <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                    <input type="text" id="records[0][employer]" name="records[0][employer]" class="pl-10 w-full border-gray-300 rounded-md" placeholder="Enter company/organization name">
+                                </div>
+                                <p class="error text-sm text-red-600 hidden" data-error="employer"></p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="calendar" class="h-4 w-4 text-gray-500"></i>
+                                <label class="text-sm font-medium text-gray-700">Employment Period</label>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">From <span class="text-red-500">*</span></label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <select name="records[0][fromMonth]" class="w-full border-gray-300 rounded-md">
+                                            <option value="">Month</option>
+                                            {% for month in months %}
+                                            <option value="{{ month }}">{{ month }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select name="records[0][fromYear]" class="w-full border-gray-300 rounded-md">
+                                            <option value="">Year</option>
+                                            {% for year in years %}
+                                            <option value="{{ year }}">{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="fromMonth"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="fromYear"></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">To <span class="text-red-500">*</span></label>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-2">
+                                            <input type="checkbox" name="records[0][currentPosition]" id="records[0][currentPosition]" class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded">
+                                            <label for="records[0][currentPosition]" class="text-sm text-gray-700">Current position</label>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2" data-to-date-container>
+                                            <select name="records[0][toMonth]" class="w-full border-gray-300 rounded-md">
+                                                <option value="">Month</option>
+                                                {% for month in months %}
+                                                <option value="{{ month }}">{{ month }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <select name="records[0][toYear]" class="w-full border-gray-300 rounded-md">
+                                                <option value="">Year</option>
+                                                {% for year in years %}
+                                                <option value="{{ year }}">{{ year }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="toMonth"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="toYear"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="dateRange"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="records[0][responsibilities]" class="text-sm font-medium text-gray-700">
+                                Key Responsibilities and Achievements <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="records[0][responsibilities]" name="records[0][responsibilities]" class="w-full border-gray-300 rounded-md" placeholder="Describe your main responsibilities, achievements, and key contributions in this role..." rows="4"></textarea>
+                            <p class="error text-sm text-red-600 hidden" data-error="responsibilities"></p>
+                            <p class="text-xs text-gray-500">Include specific achievements, skills developed, and impact made in this position.</p>
+                        </div>
+                    </div>
+                    <input type="hidden" name="records[0][id]" value="">
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Add Position Button -->
+            <button id="add-record" type="button" class="w-full border-dashed border-2 border-gray-300 hover:border-[#722F37] hover:bg-[#722F37]/5 py-4 flex items-center justify-center text-sm font-medium text-gray-700">
+                <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
+                Add Another Position
+            </button>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                <button type="button" onclick="window.location.href='/apply/2/'" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                    Previous Step
+                </button>
+                <div class="flex gap-3 sm:ml-auto">
+                    <!-- <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                        Save Draft
+                    </button> -->
+                    <button type="submit" name="action" value="next" class="bg-[#722F37] hover:bg-[#5a252a] text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
+                        Save & Continue
+                        <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                <p>&copy; 2024 School of Postgraduate Achievers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

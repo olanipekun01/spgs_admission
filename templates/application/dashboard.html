@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-[#722F37]">SPA</h1>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-lg font-medium text-gray-700">School of Postgraduate Achievers</h2>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="bell" class="h-4 w-4"></i>
+                    </button>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="settings" class="h-4 w-4"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span class="text-sm font-medium text-gray-700">John Doe</span>
+                    </div>
+                    <button onclick="handleLogout()" class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            {% for message in messages %}
+                <h5 style="color: red">{{message}}</h5>
+            {% endfor %}
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Application Dashboard</h1>
+            
+            <p class="text-gray-600">Track your application progress and manage your postgraduate journey.</p>
+        </div>
+
+        <!-- Status Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Application Status -->
+            <div class="bg-white shadow-lg border-0 rounded-lg">
+                <div class="p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Application Status</p>
+                        <p class="text-2xl font-bold text-gray-900">In Progress</p>
+                    </div>
+                    <i data-lucide="clock" class="h-8 w-8 text-yellow-700"></i>
+                </div>
+            </div>
+
+            <!-- Payment Status -->
+            <div class="bg-white shadow-lg border-0 rounded-lg">
+                <div class="p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Payment Status</p>
+                        <div class="flex items-center space-x-2">
+                            <p class="text-2xl font-bold text-gray-900">N20,000</p>
+                            {% if applicant.has_paid %}
+                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Paid</span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-700 text-blue-800">Not Paid</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <i data-lucide="banknote" class="h-8 w-8 text-green-600"></i>
+                </div>
+            </div>
+
+            <!-- Recommendations Status -->
+            <div class="bg-white shadow-lg border-0 rounded-lg">
+                <div class="p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Recommendations</p>
+                        <p class="text-2xl font-bold text-yellow-600">0/2</p>
+                    </div>
+                    <i data-lucide="users" class="h-8 w-8 text-yellow-600"></i>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="bg-white shadow-lg border-0 rounded-lg">
+                <div class="p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Progress</p>
+                        <p class="text-2xl font-bold text-gray-900">0%</p>
+                    </div>
+                    <i data-lucide="file-check" class="h-8 w-8 text-blue-600"></i>
+                </div>
+            </div>
+        </div>
+
+        {% if sess %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Application Section -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Application Status Details -->
+                <div class="bg-white shadow-lg border-0 rounded-lg">
+                    {% if applicant.has_paid %}
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold">Application Details</h3>
+                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-500 text-white">In Progress</span>
+                        </div>
+                        <div class="bg-yellow-50 rounded-lg p-6 mb-6">
+                            <div class="flex items-center mb-4">
+                                <i data-lucide="clock" class="h-8 w-8 text-yellow-700 mr-3"></i>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">Application ID: APP-2024-001</h3>
+                                    <p class="text-sm text-yellow-700">Continue completing your application</p>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                    <span>Application Progress</span>
+                                    <span>75% Complete</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-3">
+                                <button id="continue-application" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#722F37] hover:bg-[#5a252a]">
+                                    <i data-lucide="file-text" class="h-4 w-4 mr-2"></i>
+                                    Continue Application
+                                </button>
+                                <button id="edit-application" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                    <i data-lucide="edit" class="h-4 w-4 mr-2"></i>
+                                    Edit Application
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="font-medium text-gray-700">Last Updated:</span>
+                                <span class="ml-2 text-gray-600">2024-01-15</span>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700">Deadline:</span>
+                                <span class="ml-2 text-gray-600">2024-03-15</span>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700">Payment Status:</span>
+                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Paid</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                        {% if applicant %}
+                            <button onclick="goToPayment()" id="make_payment" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#006400] hover:bg-[#5a252a]">
+                                <i data-lucide="file-text" class="h-4 w-4 mr-2"></i>
+                                Make Payemnt
+                            </button>
+                        {% else %}
+
+                            <form method="post" action="/apply/dashboard/">
+                                {% csrf_token %}
+                                <button id="start-application" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#006400] hover:bg-[#5a252a]">
+                                    <i data-lucide="file-text" class="h-4 w-4 mr-2"></i>
+                                    Start Application
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Recommendations Section -->
+                <div class="bg-white shadow-lg border-0 rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold flex items-center">
+                            <i data-lucide="users" class="h-5 w-5 mr-2"></i>
+                            Recommendations (1/2)
+                        </h3>
+                    </div>
+                    <div class="px-6 pb-6 space-y-4">
+                        <div class="flex items-center justify-between p-4 border rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">Dr. Sarah Johnson</h4>
+                                <p class="text-sm text-gray-600">s.johnson@university.edu</p>
+                                <p class="text-xs text-gray-500">Sent: 2024-01-10 | Received: 2024-01-12</p>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Received</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 border rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">Prof. Michael Brown</h4>
+                                <p class="text-sm text-gray-600">m.brown@college.edu</p>
+                                <p class="text-xs text-gray-500">Sent: 2024-01-14</p>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Sent</span>
+                        </div>
+                        <button class="w-full inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-transparent hover:bg-gray-50">
+                            <i data-lucide="mail" class="h-4 w-4 mr-2"></i>
+                            Request Additional Recommendation
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Document Upload Status -->
+                <div class="bg-white shadow-lg border-0 rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold">Required Documents</h3>
+                    </div>
+                    <div class="px-6 pb-6 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-700">Academic Transcript</span>
+                            <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-700">Personal Statement</span>
+                            <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-700">CV/Resume</span>
+                            <button class="inline-flex items-center px-2 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                <i data-lucide="upload" class="h-3 w-3 mr-1"></i>
+                                Upload
+                            </button>
+                        </div>
+                        <div class="pt-2 border-t">
+                            <span class="text-sm text-gray-700">Additional Documents: 2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Dates -->
+                <div class="bg-white shadow-lg border-0 rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold flex items-center">
+                            <i data-lucide="calendar" class="h-4 w-4 mr-2"></i>
+                            Important Dates
+                        </h3>
+                    </div>
+                    <div class="px-6 pb-6 space-y-3 text-sm">
+                        <div>
+                            <div class="font-medium text-gray-700">Application Deadline</div>
+                            <div class="text-gray-600">2024-03-15</div>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-700">Decision Notification</div>
+                            <div class="text-gray-600">April 15, 2024</div>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-700">Program Start Date</div>
+                            <div class="text-gray-600">September 1, 2024</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white shadow-lg border-0 rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold">Quick Actions</h3>
+                    </div>
+                    <div class="px-6 pb-6 space-y-3">
+                        <button id="quick-continue-application" class="w-full inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-transparent hover:bg-gray-50">
+                            <i data-lucide="file-text" class="h-4 w-4 mr-2"></i>
+                            Continue Application
+                        </button>
+                        <button class="w-full inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-transparent hover:bg-gray-50">
+                            <i data-lucide="user" class="h-4 w-4 mr-2"></i>
+                            Update Profile
+                        </button>
+                        <button class="w-full inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-transparent hover:bg-gray-50">
+                            <i data-lucide="download" class="h-4 w-4 mr-2"></i>
+                            Download Documents
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Support -->
+                <div class="bg-white shadow-lg border-0 rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold">Need Help?</h3>
+                    </div>
+                    <div class="px-6 pb-6 space-y-3">
+                        <p class="text-sm text-gray-600">Our admissions team is here to help you with your application.</p>
+                        <button class="w-full inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-transparent hover:bg-gray-50">
+                            Contact Support
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <h3 class="text-lg font-semibold text-[#722F37] mb-4">School of Postgraduate Achievers</h3>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Empowering the next generation of leaders through excellence in postgraduate education and research.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#722F37] transition-colors">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M20 10C20 4.477 15.523 0 10 0S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#722F37] transition-colors">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#722F37] transition-colors">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><a href="#" class="hover:text-[#722F37] transition-colors">Application Guide</a></li>
+                        <li><a href="#" class="hover:text-[#722F37] transition-colors">Program Information</a></li>
+                        <li><a href="#" class="hover:text-[#722F37] transition-colors">Admission Requirements</a></li>
+                        <li><a href="#" class="hover:text-[#722F37] transition-colors">Financial Aid</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><a href="#" class="hover:text-[#722F37] transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-[#722F37] transition-colors">FAQ</a></li>
+                        <li><a href="#" class="hover:text-[#722F37] transition-colors">Technical Support</a></li>
+                        <li><a href="#" class="hover:text-[#722F37] transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                <p class="text-center text-sm text-gray-500">
+                    &copy; 2024 School of Postgraduate Achievers. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mock application data
+        let applicationData = {
+            id: "APP-2024-001",
+            status: "in_progress",
+            paymentStatus: "paid",
+            applicationProgress: 75,
+            lastUpdated: "2024-01-15",
+            paymentAmount: 150,
+            applicationDeadline: "2024-03-15",
+            submissionDate: undefined,
+            recommendations: {
+                received: 1,
+                required: 2,
+                recommendations: [
+                    {
+                        id: "rec1",
+                        recommenderName: "Dr. Sarah Johnson",
+                        recommenderEmail: "s.johnson@university.edu",
+                        status: "received",
+                        sentDate: "2024-01-10",
+                        receivedDate: "2024-01-12",
+                    },
+                    {
+                        id: "rec2",
+                        recommenderName: "Prof. Michael Brown",
+                        recommenderEmail: "m.brown@college.edu",
+                        status: "sent",
+                        sentDate: "2024-01-14",
+                    },
+                ],
+            },
+            documentsUploaded: {
+                transcript: true,
+                personalStatement: true,
+                cv: false,
+                additionalDocs: 2,
+            },
+        };
+
+        // Event handlers
+        document.getElementById('continue-application').addEventListener('click', () => {
+            alert('Redirecting to application form...');
+            window.location.href = '/apply/1/';
+        });
+
+        document.getElementById('edit-application').addEventListener('click', () => {
+            alert('Redirecting to edit application...');
+        });
+
+        document.getElementById('quick-continue-application').addEventListener('click', () => {
+            alert('Redirecting to application form...');
+        });
+
+        function handleLogout() {
+            window.location.href = '/accounts/logout/'; // Redirect to Django logout URL
+        }
+
+        function goToPayment() {
+            window.location.href = '/apply/payment/';
+        }
+    </script>
+</body>
+</html>

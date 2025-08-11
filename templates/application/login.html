@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - SPA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <h1 class="text-2xl font-bold text-gray-900">SPA</h1>
+          </div>
+          <div class="ml-4">
+            <h2 class="text-lg font-medium text-gray-700">
+              School of Postgraduate Achievers
+            </h2>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div
+          class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center"
+        >
+          <!-- Left Side - Login Form -->
+          <div class="order-2 lg:order-1">
+            <div class="max-w-md mx-auto lg:mx-0">
+              {% for message in messages %}
+                  <h5 style="color: red">{{message}}</h5>
+              {% endfor %}
+              <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                  Welcome Back
+                </h1>
+                <p class="text-gray-600">
+                  Sign in to your account to continue your academic journey and
+                  access your personalized dashboard.
+                </p>
+              </div>
+
+              <!-- Login Form -->
+              <form method="post" action="/accounts/login/" class="space-y-6">
+                {% csrf_token %}
+                <div>
+                  <label
+                    for="email"
+                    class="block text-sm font-medium text-gray-700"
+                    >Email address</label
+                  >
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#722F37] focus:border-[#722F37] sm:text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    for="password"
+                    class="block text-sm font-medium text-gray-700"
+                    >Password</label
+                  >
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#722F37] focus:border-[#722F37] sm:text-sm"
+                  />
+                </div>
+
+                <div>
+                  <button
+                    class="w-full py-2 px-4 bg-[#722F37] text-white font-semibold rounded-md hover:bg-[#5a252a] focus:outline-none"
+                  >
+                    Sign in
+                  </button>
+                </div>
+              </form>
+
+              <div class="mt-6 text-center space-y-2">
+                <p class="text-sm text-gray-600">
+                  Don't have an account?
+                  <a
+                    href="/accounts/signup/"
+                    class="font-medium text-[#722F37] hover:text-[#5a252a] transition-colors"
+                    >Create one here</a
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side - Welcome Back Content -->
+          <div class="order-1 lg:order-2">
+            <div class="relative">
+              <div
+                class="bg-gradient-to-br from-[#722F37] to-[#5a252a] rounded-2xl p-8 lg:p-12 text-white"
+              >
+                <div class="relative z-10">
+                  <h2 class="text-2xl lg:text-3xl font-bold mb-4">
+                    Continue Your Excellence
+                  </h2>
+                  <p class="text-lg mb-6 text-gray-100">
+                    Access your personalized learning dashboard, track your
+                    progress, and connect with your academic community.
+                  </p>
+                  <div class="space-y-3">
+                    <div class="flex items-center">
+                      <div
+                        class="w-2 h-2 bg-white rounded-full mr-3"
+                      ></div>
+                      <span>Personal academic dashboard</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div
+                        class="w-2 h-2 bg-white rounded-full mr-3"
+                      ></div>
+                      <span>Progress tracking tools</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div
+                        class="w-2 h-2 bg-white rounded-full mr-3"
+                      ></div>
+                      <span>Exclusive course materials</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div
+                        class="w-2 h-2 bg-white rounded-full mr-3"
+                      ></div>
+                      <span>Community discussions</span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"
+                ></div>
+                <div
+                  class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="text-center text-sm text-gray-500">
+          <p>&copy; 2024 School of Postgraduate Achievers. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

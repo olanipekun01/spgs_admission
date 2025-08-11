@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic & Professional References</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-[#722F37]">SPA</h1>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-lg font-medium text-gray-700">Application Form</h2>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="bell" class="h-4 w-4"></i>
+                    </button>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="settings" class="h-4 w-4"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span class="text-sm font-medium text-gray-700">John Doe</span>
+                    </div>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-700">Application Progress</h3>
+                <span class="text-sm text-gray-500">Step 4 of 6</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 67%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Academic & Professional References</h1>
+            <p class="text-gray-600">
+                Name three persons to whom references may be made.
+            </p>
+        </div>
+
+        <!-- Important Requirements -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+            <div class="flex items-start">
+                <i data-lucide="alert-circle" class="h-5 w-5 text-blue-500 mr-3 mt-0.5"></i>
+                <div>
+                    <h4 class="font-medium text-blue-800 mb-1">Reference Requirements</h4>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• Provide complete and accurate contact information for each reference</li>
+                        <li>• Ensure all references are aware they may be contacted</li>
+                        <li>• Include references who can speak to your academic and professional abilities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" action="/apply/6/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="bg-white shadow-lg border-0 rounded-lg mb-8">
+               <div class="p-6 space-y-8">
+    {% if references %}
+        {% for ref in references|slice:":3" %}
+            {% with forloop.counter0 as index %}
+                <div class="border rounded-lg p-6 bg-gray-50">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i data-lucide="user" class="h-4 w-4 mr-2"></i>
+                            Reference {{ forloop.counter }}
+                        </h3>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Basic Information -->
+                        <div class="space-y-4">
+                            <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Basic Information</h4>
+                            <div class="space-y-2">
+                                <label for="name-{{ index }}" class="text-sm font-medium text-gray-700">
+                                    Full Name <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                    <input type="text" id="name-{{ index }}" name="references[{{ index }}][name]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.name|default:'' }}" placeholder="Enter full name (e.g., Dr. John Smith)">
+                                </div>
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if 'name' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                            <p class="text-sm text-red-600">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label for="position_rank-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Position/Rank <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="position_rank-{{ index }}" name="references[{{ index }}][position_rank]" value="{{ ref.position_rank|default:'' }}" class="w-full border-gray-300 rounded-md">
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'position' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="space-y-2">
+                                    <label for="relationship_type-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Relationship Type <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="relationship_type-{{ index }}" name="references[{{ index }}][relationship_type]" value="{{ ref.relationship_type|default:'' }}" class="w-full border-gray-300 rounded-md">
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'relationship' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional Details -->
+                        <div class="space-y-4">
+                            <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Professional Details</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label for="institution_organization-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Institution/Organization <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                        <input type="text" id="institution_organization-{{ index }}" name="references[{{ index }}][institution_organization]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.institution_organization|default:'' }}" placeholder="Enter institution or organization name">
+                                    </div>
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'institution' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="space-y-2">
+                                    <label for="years_known-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Years Known <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="number" id="years_known-{{ index }}" name="references[{{ index }}][years_known]" class="w-full border-gray-300 rounded-md" value="{{ ref.years_known|default:'' }}" min="1" max="50" placeholder="Number of years">
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'years' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="space-y-4">
+                            <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Contact Information</h4>
+                            <div class="space-y-2">
+                                <label for="address-{{ index }}" class="text-sm font-medium text-gray-700">
+                                    Complete Address <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i data-lucide="map-pin" class="absolute left-3 top-3 text-gray-400 h-4 w-4"></i>
+                                    <textarea id="address-{{ index }}" name="references[{{ index }}][address]" class="w-full pl-10 border-gray-300 rounded-md" rows="3" placeholder="Enter complete address including institution/organization address">{{ ref.address|default:'' }}</textarea>
+                                </div>
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if 'address' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                            <p class="text-sm text-red-600">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label for="phone_number-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Phone Number <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="phone" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                        <input type="text" id="phone_number-{{ index }}" name="references[{{ index }}][phone_number]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.phone_number|default:'' }}" placeholder="Enter phone number">
+                                    </div>
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'phone' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="space-y-2">
+                                    <label for="email-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Email Address <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                        <input type="email" id="email-{{ index }}" name="references[{{ index }}][email]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.email|default:'' }}" placeholder="Enter email address">
+                                    </div>
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'email' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endwith %}
+        {% empty %}
+            {% for i in "123"|make_list %}
+                {% with forloop.counter0 as index %}
+                    <div class="border rounded-lg p-6 bg-gray-50">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i data-lucide="user" class="h-4 w-4 mr-2"></i>
+                                Reference {{ forloop.counter }}
+                            </h3>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Basic Information -->
+                            <div class="space-y-4">
+                                <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Basic Information</h4>
+                                <div class="space-y-2">
+                                    <label for="name-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Full Name <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                        <input type="text" id="name-{{ index }}" name="references[{{ index }}][name]" class="w-full pl-10 border-gray-300 rounded-md" value="" placeholder="Enter full name (e.g., Dr. John Smith)">
+                                    </div>
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'name' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="position_rank-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Position/Rank <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="position_rank-{{ index }}" name="references[{{ index }}][position_rank]" value="" class="w-full border-gray-300 rounded-md">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'position' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="relationship_type-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Relationship Type <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="relationship_type-{{ index }}" name="references[{{ index }}][relationship_type]" value="" class="w-full border-gray-300 rounded-md">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'relationship' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Professional Details -->
+                            <div class="space-y-4">
+                                <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Professional Details</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="institution_organization-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Institution/Organization <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                            <input type="text" id="institution_organization-{{ index }}" name="references[{{ index }}][institution_organization]" class="w-full pl-10 border-gray-300 rounded-md" value="" placeholder="Enter institution or organization name">
+                                        </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'institution' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="years_known-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Years Known <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="number" id="years_known-{{ index }}" name="references[{{ index }}][years_known]" class="w-full border-gray-300 rounded-md" value="" min="1" max="50" placeholder="Number of years">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'years' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Information -->
+                            <div class="space-y-4">
+                                <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Contact Information</h4>
+                                <div class="space-y-2">
+                                    <label for="address-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Complete Address <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="map-pin" class="absolute left-3 top-3 text-gray-400 h-4 w-4"></i>
+                                        <textarea id="address-{{ index }}" name="references[{{ index }}][address]" class="w-full pl-10 border-gray-300 rounded-md" rows="3" placeholder="Enter complete address including institution/organization address"></textarea>
+                                    </div>
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'address' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="phone_number-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Phone Number <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="phone" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                            <input type="text" id="phone_number-{{ index }}" name="references[{{ index }}][phone_number]" class="w-full pl-10 border-gray-300 rounded-md" value="" placeholder="Enter phone number">
+                                        </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'phone' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="email-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Email Address <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                            <input type="email" id="email-{{ index }}" name="references[{{ index }}][email]" class="w-full pl-10 border-gray-300 rounded-md" value="" placeholder="Enter email address">
+                                        </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'email' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endwith %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+</div>
+            </div>
+
+            <!-- Important Notice -->
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+                <div class="flex items-start">
+                    <i data-lucide="alert-circle" class="h-5 w-5 text-red-500 mr-3 mt-0.5"></i>
+                    <div>
+                        <h4 class="font-medium text-red-800 mb-1">Important Notice</h4>
+                        <p class="text-sm text-red-700">
+                            Please ensure that all references listed above are aware that they may be contacted by the University 
+                            regarding your application. Provide accurate and up-to-date contact information to avoid delays in 
+                            the application review process.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                <button type="button" onclick="window.history.back()" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                    Previous Step
+                </button>
+                <div class="flex gap-3 sm:ml-auto">
+                    <!-- <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                        Save Draft
+                    </button> -->
+                    <button type="submit" name="action" value="next" class="bg-[#722F37] hover:bg-[#5a252a] text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
+                        Save & Continue
+                        <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                <p>&copy; 2024 School of Postgraduate Achievers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

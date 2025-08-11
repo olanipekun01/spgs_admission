@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-[#722F37]">SPA</h1>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-lg font-medium text-gray-700">Application Form</h2>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="bell" class="h-4 w-4"></i>
+                    </button>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="settings" class="h-4 w-4"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span class="text-sm font-medium text-gray-700">{{ request.user.get_full_name|default:"John Doe" }}</span>
+                    </div>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-700">Application Progress</h3>
+                <span class="text-sm text-gray-500">Step 2 of 5</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 40%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% for message in messages %}
+            <h5 style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %}">{{ message }}</h5>
+        {% endfor %}
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Educational History</h1>
+            <p class="text-gray-600">
+                List below every College and University you have attended or are currently attending.
+            </p>
+        </div>
+
+        <!-- Important Notice -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+            <div class="flex items-start">
+                <i data-lucide="alert-circle" class="h-5 w-5 text-red-500 mr-3 mt-0.5"></i>
+                <div>
+                    <h4 class="font-medium text-red-800 mb-1">Important Notice</h4>
+                    <p class="text-sm text-red-700">
+                        <strong>Omitting a prior College or University from this list may result in denial of admission.</strong>
+                        Please ensure you list all institutions you have attended, even if you did not complete the program.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <form id="educationalHistoryForm" method="post" action="/apply/2/" class="space-y-8">
+            {% csrf_token %}
+            <div class="bg-white shadow-lg border-0 rounded-lg">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i data-lucide="graduation-cap" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                        Educational Records
+                    </h3>
+                </div>
+                <div class="p-6 space-y-8" id="educationalRecords">
+                    {% for record in educational_records %}
+                    <div class="border rounded-lg p-6 bg-gray-50" data-record-id="{{ record.id }}">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i data-lucide="school" class="h-4 w-4 mr-2"></i>
+                                Institution {{ forloop.counter }}
+                            </h3>
+                            {% if forloop.counter > 1 %}
+                            <button type="button" class="remove-record text-red-600 hover:text-red-700 hover:bg-red-50 inline-flex items-center justify-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md">
+                                <i data-lucide="trash-2" class="h-4 w-4 mr-1"></i>
+                                Remove
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="space-y-4">
+                            <input type="hidden" name="records[{{ forloop.counter0 }}][id]" value="{{ record.id }}">
+                            <!-- Institution Name -->
+                            <div class="space-y-2">
+                                <label for="records[{{ forloop.counter0 }}][institution]" class="text-sm font-medium text-gray-700">
+                                    Institution Name <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="records[{{ forloop.counter0 }}][institution]"
+                                    name="records[{{ forloop.counter0 }}][institution]"
+                                    class="w-full border-gray-300 rounded-md"
+                                    placeholder="Enter full name of institution"
+                                    value="{{ record.institution }}"
+                                >
+                                <p class="error text-sm text-red-600 hidden" data-error="institution"></p>
+                            </div>
+                            <!-- Diploma/Degree -->
+                            <div class="space-y-2">
+                                <label for="records[{{ forloop.counter0 }}][diplomaDegree]" class="text-sm font-medium text-gray-700">
+                                    Diploma/Degree <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="records[{{ forloop.counter0 }}][diplomaDegree]"
+                                    name="records[{{ forloop.counter0 }}][diplomaDegree]"
+                                    class="w-full border-gray-300 rounded-md"
+                                >
+                                    <option value="">Select diploma/degree</option>
+                                    {% for degree in degree_types %}
+                                    <option value="{{ degree }}" {% if record.diploma_degree == degree %}selected{% endif %}>{{ degree }}</option>
+                                    {% endfor %}
+                                </select>
+                                <p class="error text-sm text-red-600 hidden" data-error="diplomaDegree"></p>
+                            </div>
+                            <!-- Date Range -->
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="calendar" class="h-4 w-4 text-gray-500"></i>
+                                    <label class="text-sm font-medium text-gray-700">Enrollment Period</label>
+                                </div>
+                                <!-- From Date -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-700">From <span class="text-red-500">*</span></label>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <select
+                                                name="records[{{ forloop.counter0 }}][fromMonth]"
+                                                class="w-full border-gray-300 rounded-md"
+                                            >
+                                                <option value="">Month</option>
+                                                {% for month in months %}
+                                                <option value="{{ month }}" {% if record.from_month == month %}selected{% endif %}>{{ month }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <select
+                                                name="records[{{ forloop.counter0 }}][fromYear]"
+                                                class="w-full border-gray-300 rounded-md"
+                                            >
+                                                <option value="">Year</option>
+                                                {% for year in years %}
+                                                <option value="{{ year }}" {% if record.from_year == year %}selected{% endif %}>{{ year }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <p class="error text-sm text-red-600 hidden" data-error="fromMonth"></p>
+                                        <p class="error text-sm text-red-600 hidden" data-error="fromYear"></p>
+                                    </div>
+                                    <!-- To Date -->
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-700">To {% if not record.currently_enrolled %}<span class="text-red-500">*</span>{% endif %}</label>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center space-x-2">
+                                                <input
+                                                    type="checkbox"
+                                                    name="records[{{ forloop.counter0 }}][currentlyEnrolled]"
+                                                    id="records[{{ forloop.counter0 }}][currentlyEnrolled]"
+                                                    class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded"
+                                                    {% if record.currently_enrolled %}checked{% endif %}
+                                                >
+                                                <label for="records[{{ forloop.counter0 }}][currentlyEnrolled]" class="text-sm text-gray-700">Currently enrolled</label>
+                                            </div>
+                                            <div class="{% if record.currently_enrolled %}hidden{% endif %}" data-to-date-container>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <select
+                                                        name="records[{{ forloop.counter0 }}][toMonth]"
+                                                        class="w-full border-gray-300 rounded-md"
+                                                    >
+                                                        <option value="">Month</option>
+                                                        {% for month in months %}
+                                                        <option value="{{ month }}" {% if record.to_month == month %}selected{% endif %}>{{ month }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <select
+                                                        name="records[{{ forloop.counter0 }}][toYear]"
+                                                        class="w-full border-gray-300 rounded-md"
+                                                    >
+                                                        <option value="">Year</option>
+                                                        {% for year in years %}
+                                                        <option value="{{ year }}" {% if record.to_year == year %}selected{% endif %}>{{ year }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="error text-sm text-red-600 hidden" data-error="toMonth"></p>
+                                        <p class="error text-sm text-red-600 hidden" data-error="toYear"></p>
+                                        <p class="error text-sm text-red-600 hidden" data-error="dateRange"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="border rounded-lg p-6 bg-gray-50" data-record-id="new-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i data-lucide="school" class="h-4 w-4 mr-2"></i>
+                                Institution 1
+                            </h3>
+                        </div>
+                        <div class="space-y-4">
+                            <input type="hidden" name="records[0][id]" value="">
+                            <!-- Institution Name -->
+                            <div class="space-y-2">
+                                <label for="records[0][institution]" class="text-sm font-medium text-gray-700">
+                                    Institution Name <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="records[0][institution]"
+                                    name="records[0][institution]"
+                                    class="w-full border-gray-300 rounded-md"
+                                    placeholder="Enter full name of institution"
+                                >
+                                <p class="error text-sm text-red-600 hidden" data-error="institution"></p>
+                            </div>
+                            <!-- Diploma/Degree -->
+                            <div class="space-y-2">
+                                <label for="records[0][diplomaDegree]" class="text-sm font-medium text-gray-700">
+                                    Diploma/Degree <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="records[0][diplomaDegree]"
+                                    name="records[0][diplomaDegree]"
+                                    class="w-full border-gray-300 rounded-md"
+                                >
+                                    <option value="">Select diploma/degree</option>
+                                    {% for degree in degree_types %}
+                                    <option value="{{ degree }}">{{ degree }}</option>
+                                    {% endfor %}
+                                </select>
+                                <p class="error text-sm text-red-600 hidden" data-error="diplomaDegree"></p>
+                            </div>
+                            <!-- Date Range -->
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="calendar" class="h-4 w-4 text-gray-500"></i>
+                                    <label class="text-sm font-medium text-gray-700">Enrollment Period</label>
+                                </div>
+                                <!-- From Date -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-700">From <span class="text-red-500">*</span></label>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <select
+                                                name="records[0][fromMonth]"
+                                                class="w-full border-gray-300 rounded-md"
+                                            >
+                                                <option value="">Month</option>
+                                                {% for month in months %}
+                                                <option value="{{ month }}">{{ month }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <select
+                                                name="records[0][fromYear]"
+                                                class="w-full border-gray-300 rounded-md"
+                                            >
+                                                <option value="">Year</option>
+                                                {% for year in years %}
+                                                <option value="{{ year }}">{{ year }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <p class="error text-sm text-red-600 hidden" data-error="fromMonth"></p>
+                                        <p class="error text-sm text-red-600 hidden" data-error="fromYear"></p>
+                                    </div>
+                                    <!-- To Date -->
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-700">To <span class="text-red-500">*</span></label>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center space-x-2">
+                                                <input
+                                                    type="checkbox"
+                                                    name="records[0][currentlyEnrolled]"
+                                                    id="records[0][currentlyEnrolled]"
+                                                    class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded"
+                                                >
+                                                <label for="records[0][currentlyEnrolled]" class="text-sm text-gray-700">Currently enrolled</label>
+                                            </div>
+                                            <div data-to-date-container>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <select
+                                                        name="records[0][toMonth]"
+                                                        class="w-full border-gray-300 rounded-md"
+                                                    >
+                                                        <option value="">Month</option>
+                                                        {% for month in months %}
+                                                        <option value="{{ month }}">{{ month }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <select
+                                                        name="records[0][toYear]"
+                                                        class="w-full border-gray-300 rounded-md"
+                                                    >
+                                                        <option value="">Year</option>
+                                                        {% for year in years %}
+                                                        <option value="{{ year }}">{{ year }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="error text-sm text-red-600 hidden" data-error="toMonth"></p>
+                                        <p class="error text-sm text-red-600 hidden" data-error="toYear"></p>
+                                        <p class="error text-sm text-red-600 hidden" data-error="dateRange"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Add Institution Button -->
+                <div class="p-6">
+                    <button
+                        type="button"
+                        id="add-record"
+                        class="w-full border-dashed border-2 border-gray-300 hover:border-[#722F37] hover:bg-[#722F37]/10 py-4 inline-flex items-center justify-center text-sm font-medium text-gray-700 rounded-md"
+                    >
+                        <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
+                        Add Another Institution
+                    </button>
+                </div>
+            </div>
+
+            <!-- Transcript Instructions -->
+            <div class="bg-white shadow-lg border-0 rounded-lg">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i data-lucide="file-text" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                        Official Transcript Instructions
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-medium text-blue-800 mb-2">Important: Official Transcripts Required</h4>
+                        <p class="text-sm text-blue-700 mb-3">
+                            Contact the Registrar's Office at each of the institutions listed above and have your official
+                            transcripts sent directly to:
+                        </p>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="transcriptInstructions" class="text-sm font-medium text-gray-700">
+                            Send Official Transcripts To:
+                        </label>
+                        <textarea
+                            id="transcriptInstructions"
+                            name="transcriptInstructions"
+                            class="w-full border-gray-300 bg-gray-50 rounded-md"
+                            rows="4"
+                            readonly
+                        >{{ transcript_instructions }}</textarea>
+                        <p class="text-xs text-gray-500">
+                            This address is pre-filled and cannot be modified. Please ensure your institutions send transcripts to
+                            this exact address.
+                        </p>
+                    </div>
+                    <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <h5 class="font-medium text-yellow-800 mb-2">Additional Notes:</h5>
+                        <ul class="text-sm text-yellow-700 space-y-1">
+                            <li>• Transcripts must be sent directly from the institution</li>
+                            <li>• Unofficial transcripts or student copies will not be accepted</li>
+                            <li>• Allow 2-3 weeks for transcript processing</li>
+                            <li>• Contact institutions early to avoid delays in your application review</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                <button
+                    type="button"
+                    onclick="window.location.href='/apply/1/'"
+                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                    Previous Step
+                </button>
+                <div class="flex gap-3 sm:ml-auto">
+                    <button
+                        type="submit"
+                        name="save_draft"
+                        class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-transparent hover:bg-gray-50"
+                    >
+                        <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                        Save Draft
+                    </button>
+                    <button
+                        type="button"
+                        id="save-continue"
+                        class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#722F37] hover:bg-[#5a252a]"
+                    >
+                        Save & Continue
+                        <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                <p>&copy; 2024 School of Postgraduate Achievers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Constants
+        const months = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        const currentYear = new Date().getFullYear();
+        const years = Array.from({ length: 50 }, (_, i) => (currentYear - i).toString());
+        const degreeTypes = [
+            "Bachelor of Science (B.Sc.)",
+            "Bachelor of Arts (B.A.)",
+            "Bachelor of Engineering (B.Eng.)",
+            "Bachelor of Technology (B.Tech.)",
+            "Higher National Diploma (HND)",
+            "National Diploma (ND)",
+            "Master of Science (M.Sc.)",
+            "Master of Arts (M.A.)",
+            "Master of Engineering (M.Eng.)",
+            "Master of Business Administration (MBA)",
+            "Doctor of Philosophy (Ph.D.)",
+            "Other (Please specify in institution field)"
+        ];
+
+        // Form data
+        let formData = {
+            records: [
+                {% for record in educational_records %}
+                {
+                    id: "{{ record.id }}",
+                    institution: "{{ record.institution }}",
+                    diplomaDegree: "{{ record.diploma_degree }}",
+                    fromMonth: "{{ record.from_month }}",
+                    fromYear: "{{ record.from_year }}",
+                    toMonth: "{{ record.to_month }}",
+                    toYear: "{{ record.to_year }}",
+                    currentlyEnrolled: {{ record.currently_enrolled|lower }}
+                }{% if not forloop.last %},{% endif %}
+                {% empty %}
+                {
+                    id: "new-1",
+                    institution: "",
+                    diplomaDegree: "",
+                    fromMonth: "",
+                    fromYear: "",
+                    toMonth: "",
+                    toYear: "",
+                    currentlyEnrolled: false
+                }
+                {% endfor %}
+            ],
+            transcriptInstructions: "{{ transcript_instructions|escapejs }}"
+        };
+
+        let isLoading = false;
+        let recordCounter = {{ educational_records|length|default:1 }};
+
+        // DOM elements
+        const educationalRecordsContainer = document.getElementById('educationalRecords');
+        const addRecordButton = document.getElementById('save-continue');
+        const form = document.getElementById('educationalHistoryForm');
+
+        // Add new educational record
+        function addEducationalRecord() {
+            recordCounter++;
+            const recordId = `new-${recordCounter}`;
+            const template = `
+                <div class="border rounded-lg p-6 bg-gray-50" data-record-id="${recordId}">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i data-lucide="school" class="h-4 w-4 mr-2"></i>
+                            Institution ${recordCounter}
+                        </h3>
+                        <button type="button" class="remove-record text-red-600 hover:text-red-700 hover:bg-red-50 inline-flex items-center justify-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md">
+                            <i data-lucide="trash-2" class="h-4 w-4 mr-1"></i>
+                            Remove
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <input type="hidden" name="records[${recordCounter - 1}][id]" value="">
+                        <div class="space-y-2">
+                            <label for="records[${recordCounter - 1}][institution]" class="text-sm font-medium text-gray-700">
+                                Institution Name <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="records[${recordCounter - 1}][institution]"
+                                name="records[${recordCounter - 1}][institution]"
+                                class="w-full border-gray-300 rounded-md"
+                                placeholder="Enter full name of institution"
+                            >
+                            <p class="error text-sm text-red-600 hidden" data-error="institution"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="records[${recordCounter - 1}][diplomaDegree]" class="text-sm font-medium text-gray-700">
+                                Diploma/Degree <span class="text-red-500">*</span>
+                            </label>
+                            <select
+                                id="records[${recordCounter - 1}][diplomaDegree]"
+                                name="records[${recordCounter - 1}][diplomaDegree]"
+                                class="w-full border-gray-300 rounded-md"
+                            >
+                                <option value="">Select diploma/degree</option>
+                                ${degreeTypes.map(degree => `<option value="${degree}">${degree}</option>`).join('')}
+                            </select>
+                            <p class="error text-sm text-red-600 hidden" data-error="diplomaDegree"></p>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="calendar" class="h-4 w-4 text-gray-500"></i>
+                                <label class="text-sm font-medium text-gray-700">Enrollment Period</label>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">From <span class="text-red-500">*</span></label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <select
+                                            name="records[${recordCounter - 1}][fromMonth]"
+                                            class="w-full border-gray-300 rounded-md"
+                                        >
+                                            <option value="">Month</option>
+                                            ${months.map(month => `<option value="${month}">${month}</option>`).join('')}
+                                        </select>
+                                        <select
+                                            name="records[${recordCounter - 1}][fromYear]"
+                                            class="w-full border-gray-300 rounded-md"
+                                        >
+                                            <option value="">Year</option>
+                                            ${years.map(year => `<option value="${year}">${year}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="fromMonth"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="fromYear"></p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">To <span class="text-red-500">*</span></label>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                name="records[${recordCounter - 1}][currentlyEnrolled]"
+                                                id="records[${recordCounter - 1}][currentlyEnrolled]"
+                                                class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded"
+                                            >
+                                            <label for="records[${recordCounter - 1}][currentlyEnrolled]" class="text-sm text-gray-700">Currently enrolled</label>
+                                        </div>
+                                        <div data-to-date-container>
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <select
+                                                    name="records[${recordCounter - 1}][toMonth]"
+                                                    class="w-full border-gray-300 rounded-md"
+                                                >
+                                                    <option value="">Month</option>
+                                                    ${months.map(month => `<option value="${month}">${month}</option>`).join('')}
+                                                </select>
+                                                <select
+                                                    name="records[${recordCounter - 1}][toYear]"
+                                                    class="w-full border-gray-300 rounded-md"
+                                                >
+                                                    <option value="">Year</option>
+                                                    ${years.map(year => `<option value="${year}">${year}</option>`).join('')}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="error text-sm text-red-600 hidden" data-error="toMonth"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="toYear"></p>
+                                    <p class="error text-sm text-red-600 hidden" data-error="dateRange"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            educationalRecordsContainer.insertAdjacentHTML('beforeend', template);
+            lucide.createIcons();
+            updateEventListeners();
+            formData.records.push({
+                id: recordId,
+                institution: "",
+                diplomaDegree: "",
+                fromMonth: "",
+                fromYear: "",
+                toMonth: "",
+                toYear: "",
+                currentlyEnrolled: false
+            });
+        }
+
+        // Remove educational record
+        function removeEducationalRecord(recordId) {
+            if (formData.records.length > 1) {
+                const recordElement = document.querySelector(`[data-record-id="${recordId}"]`);
+                if (recordElement) {
+                    recordElement.remove();
+                    formData.records = formData.records.filter(record => record.id !== recordId);
+                    // Reindex form fields
+                    reindexFormFields();
+                }
+            }
+        }
+
+        // Reindex form fields after removal
+        function reindexFormFields() {
+            const records = educationalRecordsContainer.querySelectorAll('[data-record-id]');
+            records.forEach((record, index) => {
+                const inputs = record.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    const name = input.name;
+                    if (name) {
+                        input.name = name.replace(/records\[\d+\]/, `records[${index}]`);
+                    }
+                    const id = input.id;
+                    if (id) {
+                        input.id = id.replace(/records\[\d+\]/, `records[${index}]`);
+                    }
+                    if (input.type === 'checkbox') {
+                        const label = record.querySelector(`label[for="${id}"]`);
+                        if (label) {
+                            label.setAttribute('for', input.id);
+                        }
+                    }
+                });
+                const title = record.querySelector('h3');
+                if (title) {
+                    title.innerHTML = `<i data-lucide="school" class="h-4 w-4 mr-2"></i>Institution ${index + 1}`;
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // Update event listeners
+        function updateEventListeners() {
+            // Remove record buttons
+            document.querySelectorAll('.remove-record').forEach(button => {
+                button.removeEventListener('click', handleRemoveClick); // Prevent duplicate listeners
+                button.addEventListener('click', handleRemoveClick);
+            });
+
+            // Currently enrolled checkboxes
+            document.querySelectorAll('input[name$="[currentlyEnrolled]"]').forEach(checkbox => {
+                checkbox.removeEventListener('change', handleCurrentlyEnrolledChange);
+                checkbox.addEventListener('change', handleCurrentlyEnrolledChange);
+            });
+
+            // Input change handlers
+            document.querySelectorAll('input:not([type="checkbox"]), select').forEach(input => {
+                input.removeEventListener('input', handleInputChange);
+                input.removeEventListener('change', handleInputChange);
+                input.addEventListener(input.tagName === 'SELECT' ? 'change' : 'input', handleInputChange);
+            });
+        }
+
+        // Handle remove button click
+        function handleRemoveClick(event) {
+            const recordElement = event.target.closest('[data-record-id]');
+            const recordId = recordElement.getAttribute('data-record-id');
+            removeEducationalRecord(recordId);
+        }
+
+        // Handle currently enrolled checkbox change
+        function handleCurrentlyEnrolledChange(event) {
+            const checkbox = event.target;
+            const recordElement = checkbox.closest('[data-record-id]');
+            const toDateContainer = recordElement.querySelector('[data-to-date-container]');
+            toDateContainer.classList.toggle('hidden', checkbox.checked);
+            const recordId = recordElement.getAttribute('data-record-id');
+            const recordIndex = formData.records.findIndex(r => r.id === recordId);
+            if (recordIndex !== -1) {
+                formData.records[recordIndex].currentlyEnrolled = checkbox.checked;
+                if (checkbox.checked) {
+                    formData.records[recordIndex].toMonth = "";
+                    formData.records[recordIndex].toYear = "";
+                    clearErrors(recordId, ['toMonth', 'toYear', 'dateRange']);
+                }
+            }
+        }
+
+        // Handle input change
+        function handleInputChange(event) {
+            const input = event.target;
+            const recordElement = input.closest('[data-record-id]');
+            const recordId = recordElement.getAttribute('data-record-id');
+            const field = input.name.match(/\[([^\]]*)\]$/)[1];
+            const recordIndex = formData.records.findIndex(r => r.id === recordId);
+            if (recordIndex !== -1) {
+                formData.records[recordIndex][field] = input.value;
+                clearErrors(recordId, [field]);
+            }
+        }
+
+        // Clear errors
+        function clearErrors(recordId, fields) {
+            fields.forEach(field => {
+                const errorElement = document.querySelector(`[data-record-id="${recordId}"] [data-error="${field}"]`);
+                if (errorElement) {
+                    errorElement.classList.add('hidden');
+                    errorElement.textContent = '';
+                }
+                const input = document.querySelector(`[data-record-id="${recordId}"] [name$="[${field}]"]`);
+                if (input) {
+                    input.classList.remove('border-red-500');
+                    input.classList.add('border-gray-300');
+                }
+            });
+        }
+
+        // Form validation
+        function validateForm() {
+            const errors = {};
+            formData.records.forEach((record, index) => {
+                if (!record.institution.trim()) {
+                    errors[`${record.id}-institution`] = `Institution name is required for record ${index + 1}`;
+                }
+                if (!record.diplomaDegree.trim()) {
+                    errors[`${record.id}-diplomaDegree`] = `Diploma/Degree is required for record ${index + 1}`;
+                }
+                if (!record.fromMonth) {
+                    errors[`${record.id}-fromMonth`] = `Start month is required for record ${index + 1}`;
+                }
+                if (!record.fromYear) {
+                    errors[`${record.id}-fromYear`] = `Start year is required for record ${index + 1}`;
+                }
+                if (!record.currentlyEnrolled) {
+                    if (!record.toMonth) {
+                        errors[`${record.id}-toMonth`] = `End month is required for record ${index + 1}`;
+                    }
+                    if (!record.toYear) {
+                        errors[`${record.id}-toYear`] = `End year is required for record ${index + 1}`;
+                    }
+                    if (record.fromYear && record.toYear && record.fromMonth && record.toMonth) {
+                        const fromDate = new Date(parseInt(record.fromYear), months.indexOf(record.fromMonth));
+                        const toDate = new Date(parseInt(record.toYear), months.indexOf(record.toMonth));
+                        if (fromDate >= toDate) {
+                            errors[`${record.id}-dateRange`] = `End date must be after start date for record ${index + 1}`;
+                        }
+                    }
+                }
+            });
+
+            Object.keys(errors).forEach(key => {
+                const [recordId, field] = key.split('-');
+                const errorElement = document.querySelector(`[data-record-id="${recordId}"] [data-error="${field}"]`);
+                const input = document.querySelector(`[data-record-id="${recordId}"] [name$="[${field}]"]`);
+                if (errorElement) {
+                    errorElement.textContent = errors[key];
+                    errorElement.classList.remove('hidden');
+                }
+                if (input) {
+                    input.classList.add('border-red-500');
+                    input.classList.remove('border-gray-300');
+                }
+            });
+
+            console.log('Validation errors:', errors);
+            return Object.keys(errors).length === 0;
+        }
+
+        // Handle form submission
+        async function handleNext() {
+            if (!validateForm()) {
+                console.log('Validation failed');
+                return;
+            }
+            console.log('Validation passed, submitting form...');
+
+            isLoading = true;
+            addRecordButton.disabled = true;
+            addRecordButton.innerHTML = `Saving...<i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>`;
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                form.submit();
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert("Failed to save. Please try again.");
+            } finally {
+                isLoading = false;
+                addRecordButton.disabled = false;
+                addRecordButton.innerHTML = `Save & Continue<i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>`;
+                lucide.createIcons();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('add-record').addEventListener('click', addEducationalRecord);
+        document.getElementById('save-continue').addEventListener('click', handleNext);
+        updateEventListeners();
+
+        // Initialize currently enrolled state
+        document.querySelectorAll('input[name$="[currentlyEnrolled]"]').forEach(checkbox => {
+            const recordElement = checkbox.closest('[data-record-id]');
+            const toDateContainer = recordElement.querySelector('[data-to-date-container]');
+            toDateContainer.classList.toggle('hidden', checkbox.checked);
+        });
+    </script>
+</body>
+</html>

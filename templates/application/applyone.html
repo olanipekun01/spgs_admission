@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Information</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-[#722F37]">SPA</h1>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-lg font-medium text-gray-700">Application Form</h2>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="bell" class="h-4 w-4"></i>
+                    </button>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="settings" class="h-4 w-4"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span class="text-sm font-medium text-gray-700">John Doe</span>
+                    </div>
+                    <button class="p-1 text-gray-600 hover:text-gray-900">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-700">Application Progress</h3>
+                <span class="text-sm text-gray-500">Step 1 of 5</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 20%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% for message in messages %}
+            <h5 style="color: red">{{message}}</h5>
+        {% endfor %}
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Personal Information</h1>
+            <p class="text-gray-600">Please provide your personal details accurately as they will appear on official documents.</p>
+        </div>
+
+        <div class="bg-white shadow-lg border-0 rounded-lg">
+            <div class="p-6">
+                <h3 class="text-xl font-semibold flex items-center">
+                    <i data-lucide="user" class="h-5 w-5 mr-2 text-[#722F37]"></i>
+                    Personal Details
+                </h3>
+            </div>
+            <form id="personalInfoForm" method="post" action="/apply/1/" class="p-6 space-y-6">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="department" class="text-sm font-medium text-gray-700">Department to which Admission is sought <span class="text-red-500">*</span></label>
+                        <select id="department" name="department" class="w-full border-gray-300 rounded-md">
+                            <option value="">Select department</option>
+                            {% for dept in department %}
+                            <option value="{{ dept.name }}" {% if applicant.department == dept.name %}selected{% endif %}>{{ dept.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <p id="department-error" class="text-sm text-red-600 hidden"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="faculty" class="text-sm font-medium text-gray-700">Faculty/College/School <span class="text-red-500">*</span></label>
+                        <select id="faculty" name="faculty" class="w-full border-gray-300 rounded-md">
+                            <option value="">Select Faculty/College/School</option>
+                            {% for college in college %}
+                            <option value="{{ college.name }}" {% if applicant.college == college.name %}selected{% endif %}>{{ college.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <p id="faculty-error" class="text-sm text-red-600 hidden"></p>
+                    </div>
+                </div>
+                <!-- Programme and Specialization -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="programme" class="text-sm font-medium text-gray-700">Programme <span class="text-red-500">*</span></label>
+                        <select id="programme" name="programme" class="w-full border-gray-300 rounded-md">
+                            <option value="">Select programme</option>
+                            {% for programme in programme %}
+                            <option value="{{ programme.name }}" {% if applicant.programme == programme.name %}selected{% endif %}>{{ programme.name }}</option>
+                            {% endfor %}
+                            
+                        </select>
+                        <p id="programme-error" class="text-sm text-red-600 hidden"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="areaOfSpecialization" class="text-sm font-medium text-gray-700">Area of Specialization <span class="text-red-500">*</span></label>
+                        <input id="areaOfSpecialization" name="areaOfSpecialization" 
+                            class="w-full border-gray-300 rounded-md" 
+                            placeholder="Enter area of specialization" 
+                            value="{{ applicant.area_of_specialization|default:'' }}"
+                        >
+                        <p id="areaOfSpecialization-error" class="text-sm text-red-600 hidden"></p>
+                    </div>
+                </div>
+
+                <!-- Name Section -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-900 border-b pb-2">Name</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Title <span class="text-red-500">*</span></label>
+                            <div class="flex flex-wrap gap-4">
+                                {% for value, label in personal.TITLE_CHOICES %}
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="title" value="{{ value }}" id="{{ value|lower }}" class="h-4 w-4" {% if personal.title == value %}checked{% endif %}>
+                                    <label for="{{ value|lower }}" class="text-sm">{{ label }}</label>
+                                </div>
+                                {% endfor %}
+                                <!-- <div class="flex items-center space-x-2">
+                                    <input type="radio" name="title" value="Dr." id="dr" class="h-4 w-4">
+                                    <label for="dr" class="text-sm">Dr.</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="title" value="Mr." id="mr" class="h-4 w-4">
+                                    <label for="mr" class="text-sm">Mr.</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="title" value="Mrs." id="mrs" class="h-4 w-4">
+                                    <label for="mrs" class="text-sm">Mrs.</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="title" value="Ms." id="ms" class="h-4 w-4">
+                                    <label for="ms" class="text-sm">Ms.</label>
+                                </div> -->
+                            </div>
+                            <p id="title-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="space-y-2">
+                            <label for="surname" class="text-sm font-medium text-gray-700">Surname <span class="text-red-500">*</span></label>
+                            <input id="surname" name="surname" class="w-full border-gray-300 rounded-md" placeholder="Enter surname" value="{{ personal.surname|default:'' }}">
+                            <p id="surname-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="firstName" class="text-sm font-medium text-gray-700">First Name <span class="text-red-500">*</span></label>
+                            <input id="firstName" name="firstName" class="w-full border-gray-300 rounded-md" placeholder="Enter first name" value="{{ personal.first_name|default:'' }}">
+                            <p id="firstName-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="middleName" class="text-sm font-medium text-gray-700">Middle Name</label>
+                            <input id="middleName" name="middleName" class="w-full border-gray-300 rounded-md" placeholder="Enter middle name (optional)" value="{{ personal.middle_name|default:'' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-900 border-b pb-2">Contact Information</h3>
+                    <div class="space-y-2">
+                        <label for="mailingAddress" class="text-sm font-medium text-gray-700">Mailing Address (P.O. Box or Street Address) <span class="text-red-500">*</span></label>
+                        <textarea id="mailingAddress" name="mailingAddress" class="w-full border-gray-300 rounded-md" placeholder="Enter your complete mailing address" rows="3">{{ personal.mailing_address|default:'' }}</textarea>
+                        <p id="mailingAddress-error" class="text-sm text-red-600 hidden"></p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="mobilePhone" class="text-sm font-medium text-gray-700">Mobile Phone No <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i data-lucide="phone" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                <input id="mobilePhone" name="mobilePhone" class="pl-10 w-full border-gray-300 rounded-md" placeholder="Enter mobile phone number" value="{{ personal.mobile_phone|default:'' }}">
+                            </div>
+                            <p id="mobilePhone-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="email" class="text-sm font-medium text-gray-700">E-mail Address <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i data-lucide="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                <input id="email" name="email" type="email" class="pl-10 w-full border-gray-300 rounded-md" placeholder="Enter email address" value="{{ personal.email|default:'' }}">
+                            </div>
+                            <p id="email-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Details -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-900 border-b pb-2">Personal Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="dateOfBirth" class="text-sm font-medium text-gray-700">Date of Birth <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i data-lucide="calendar" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                <input id="dateOfBirth" name="dateOfBirth" type="date" class="pl-10 w-full border-gray-300 rounded-md" value="{{ personal.date_of_birth|date:'Y-m-d'|default:'' }}">
+                            </div>
+                            <p id="dateOfBirth-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="placeOfBirth" class="text-sm font-medium text-gray-700">Place of Birth <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i data-lucide="map-pin" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                <input id="placeOfBirth" name="placeOfBirth" class="pl-10 w-full border-gray-300 rounded-md" placeholder="Enter place of birth" value="{{ personal.place_of_birth|default:'' }}">
+                            </div>
+                            <p id="placeOfBirth-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="stateOfOrigin" class="text-sm font-medium text-gray-700">State of Origin <span class="text-red-500">*</span></label>
+                            <select id="stateOfOrigin" name="stateOfOrigin" class="w-full border-gray-300 rounded-md">
+                                <option value="">Select state of origin</option>
+                                {% for value, label in personal.STATE_OF_ORIGIN_CHOICES %}
+                                <option value="{{ value }}" {% if personal.state_of_origin == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                                <!-- <option value="">Select state of origin</option>
+                                <option value="Abia">Abia</option>
+                                <option value="Adamawa">Adamawa</option>
+                                <option value="Akwa Ibom">Akwa Ibom</option>
+                                <option value="Anambra">Anambra</option>
+                                <option value="Bauchi">Bauchi</option>
+                                <option value="Bayelsa">Bayelsa</option>
+                                <option value="Benue">Benue</option>
+                                <option value="Borno">Borno</option>
+                                <option value="Cross River">Cross River</option>
+                                <option value="Delta">Delta</option>
+                                <option value="Ebonyi">Ebonyi</option>
+                                <option value="Edo">Edo</option>
+                                <option value="Ekiti">Ekiti</option>
+                                <option value="Enugu">Enugu</option>
+                                <option value="FCT">FCT</option>
+                                <option value="Gombe">Gombe</option>
+                                <option value="Imo">Imo</option>
+                                <option value="Jigawa">Jigawa</option>
+                                <option value="Kaduna">Kaduna</option>
+                                <option value="Kano">Kano</option>
+                                <option value="Katsina">Katsina</option>
+                                <option value="Kebbi">Kebbi</option>
+                                <option value="Kogi">Kogi</option>
+                                <option value="Kwara">Kwara</option>
+                                <option value="Lagos">Lagos</option>
+                                <option value="Nasarawa">Nasarawa</option>
+                                <option value="Niger">Niger</option>
+                                <option value="Ogun">Ogun</option>
+                                <option value="Ondo">Ondo</option>
+                                <option value="Osun">Osun</option>
+                                <option value="Oyo">Oyo</option>
+                                <option value="Plateau">Plateau</option>
+                                <option value="Rivers">Rivers</option>
+                                <option value="Sokoto">Sokoto</option>
+                                <option value="Taraba">Taraba</option>
+                                <option value="Yobe">Yobe</option>
+                                <option value="Zamfara">Zamfara</option> -->
+                            </select>
+                            <p id="stateOfOrigin-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="nationality" class="text-sm font-medium text-gray-700">Nationality <span class="text-red-500">*</span></label>
+                            <input id="nationality" name="nationality" class="w-full border-gray-300 rounded-md" placeholder="Enter nationality" value="{{ personal.nationality|default:'' }}">
+                            <p id="nationality-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gender and Marital Status -->
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Gender <span class="text-red-500">*</span></label>
+                            <div class="flex gap-6">
+                                {% for value, label in personal.GENDER_CHOICES %}
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="gender" value="{{ value }}" id="{{ value|lower }}" class="h-4 w-4" {% if personal.gender == value %}checked{% endif %}>
+                                    <label for="{{ value|lower }}" class="text-sm">{{ label }}</label>
+                                </div>
+                                {% endfor %}
+                                <!-- <div class="flex items-center space-x-2">
+                                    <input type="radio" name="gender" value="M" id="male" class="h-4 w-4">
+                                    <label for="male" class="text-sm">Male</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="gender" value="F" id="female" class="h-4 w-4">
+                                    <label for="female" class="text-sm">Female</label>
+                                </div> -->
+                            </div>
+                            <p id="gender-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Marital Status <span class="text-red-500">*</span></label>
+                            <div class="flex flex-wrap gap-4">
+                                {% for value, label in personal.MARITAL_STATUS_CHOICES %}
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="maritalStatus" value="{{ value }}" id="{{ value|lower }}" class="h-4 w-4" {% if personal.marital_status == value %}checked{% endif %}>
+                                    <label for="{{ value|lower }}" class="text-sm">{{ label }}</label>
+                                </div>
+                                {% endfor %}
+                                <!-- <div class="flex items-center space-x-2">
+                                    <input type="radio" name="maritalStatus" value="single" id="single" class="h-4 w-4">
+                                    <label for="single" class="text-sm">Single</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="maritalStatus" value="married" id="married" class="h-4 w-4">
+                                    <label for="married" class="text-sm">Married</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="maritalStatus" value="widowed" id="widowed" class="h-4 w-4">
+                                    <label for="widowed" class="text-sm">Widowed</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="maritalStatus" value="divorced" id="divorced" class="h-4 w-4">
+                                    <label for="divorced" class="text-sm">Divorced</label>
+                                </div> -->
+                            </div>
+                            <p id="maritalStatus-error" class="text-sm text-red-600 hidden"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Religious Affiliation -->
+                <div class="space-y-4">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="text-sm text-blue-700 mb-3">
+                            <strong>Note:</strong> Religious affiliation information is for statistical analysis only. It is not used in the admission process and will have no bearing on your admission status.
+                        </p>
+                        <div class="space-y-3">
+                            <label class="text-sm font-medium text-gray-700">Religious Affiliation <span class="text-red-500">*</span></label>
+                            <div class="flex flex-wrap gap-6">
+                                {% for value, label in personal.RELIGIOUS_AFFILIATION_CHOICES %}
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="religiousAffiliation" value="{{ value }}" id="{{ value|lower }}" class="h-4 w-4" {% if personal.religious_affiliation == value %}checked{% endif %}>
+                                    <label for="{{ value|lower }}" class="text-sm">{{ label }}</label>
+                                </div>
+                                {% endfor %}
+                                <!-- <div class="flex items-center space-x-2">
+                                    <input type="radio" name="religiousAffiliation" value="christian" id="christian" class="h-4 w-4">
+                                    <label for="christian" class="text-sm">Christian</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="religiousAffiliation" value="islam" id="islam" class="h-4 w-4">
+                                    <label for="islam" class="text-sm">Islam</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="radio" name="religiousAffiliation" value="others" id="others" class="h-4 w-4">
+                                    <label for="others" class="text-sm">Others</label>
+                                </div> -->
+                            </div>
+                            <p id="religiousAffiliation-error" class="text-sm text-red-600 hidden"></p>
+                            <div id="otherReligion-container" class="mt-3 hidden">
+                                <label for="otherReligion" class="text-sm font-medium text-gray-700">Please specify <span class="text-red-500">*</span></label>
+                                <input id="otherReligion" name="otherReligion" class="w-full border-gray-300 rounded-md" placeholder="Specify other religion" value="{{ personal.other_religion|default:'' }}">
+                                <p id="otherReligion-error" class="text-sm text-red-600 hidden"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t">
+                    <button type="button" onclick="window.location.href='/apply/dashboard/'" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                        Back to Dashboard
+                    </button>
+                    <div class="flex gap-3 sm:ml-auto">
+                        <!-- <button id="save-draft" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-transparent hover:bg-gray-50">
+                            <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                            Save Draft
+                        </button> -->
+                        <button type="button" id="save-continue" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#722F37] hover:bg-[#5a252a]">
+                            Save & Continue
+                            <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                <p>&copy; 2024 School of Postgraduate Achievers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mock user and form data
+        const mockUser = {
+            firstName: "John",
+            lastName: "Doe",
+            email: "john.doe@email.com",
+            profileImage: "/placeholder.svg?height=40&width=40",
+        };
+
+        let formData = {
+            department: "",
+            faculty: "",
+            programme: "",
+            areaOfSpecialization: "",
+            title: "",
+            surname: "",
+            firstName: "",
+            middleName: "",
+            mailingAddress: "",
+            mobilePhone: "",
+            email: "",
+            dateOfBirth: "",
+            placeOfBirth: "",
+            stateOfOrigin: "",
+            nationality: "",
+            gender: "",
+            maritalStatus: "",
+            religiousAffiliation: "",
+            otherReligion: "",
+        };
+
+        let isLoading = false;
+
+        // DOM elements
+        const inputs = {
+            department: document.getElementById('department'),
+            faculty: document.getElementById('faculty'),
+            programme: document.getElementById('programme'),
+            areaOfSpecialization: document.getElementById('areaOfSpecialization'),
+            title: document.querySelectorAll('input[name="title"]'),
+            surname: document.getElementById('surname'),
+            firstName: document.getElementById('firstName'),
+            middleName: document.getElementById('middleName'),
+            mailingAddress: document.getElementById('mailingAddress'),
+            mobilePhone: document.getElementById('mobilePhone'),
+            email: document.getElementById('email'),
+            dateOfBirth: document.getElementById('dateOfBirth'),
+            placeOfBirth: document.getElementById('placeOfBirth'),
+            stateOfOrigin: document.getElementById('stateOfOrigin'),
+            nationality: document.getElementById('nationality'),
+            gender: document.querySelectorAll('input[name="gender"]'),
+            maritalStatus: document.querySelectorAll('input[name="maritalStatus"]'),
+            religiousAffiliation: document.querySelectorAll('input[name="religiousAffiliation"]'),
+            otherReligion: document.getElementById('otherReligion'),
+        };
+
+        const errorDisplays = {
+            department: document.getElementById('department-error'),
+            faculty: document.getElementById('faculty-error'),
+            programme: document.getElementById('programme-error'),
+            areaOfSpecialization: document.getElementById('areaOfSpecialization-error'),
+            title: document.getElementById('title-error'),
+            surname: document.getElementById('surname-error'),
+            firstName: document.getElementById('firstName-error'),
+            mailingAddress: document.getElementById('mailingAddress-error'),
+            mobilePhone: document.getElementById('mobilePhone-error'),
+            email: document.getElementById('email-error'),
+            dateOfBirth: document.getElementById('dateOfBirth-error'),
+            placeOfBirth: document.getElementById('placeOfBirth-error'),
+            stateOfOrigin: document.getElementById('stateOfOrigin-error'),
+            nationality: document.getElementById('nationality-error'),
+            gender: document.getElementById('gender-error'),
+            maritalStatus: document.getElementById('maritalStatus-error'),
+            religiousAffiliation: document.getElementById('religiousAffiliation-error'),
+            otherReligion: document.getElementById('otherReligion-error'),
+        };
+
+        const saveDraftButton = document.getElementById('save-draft');
+        const saveContinueButton = document.getElementById('save-continue');
+        const otherReligionContainer = document.getElementById('otherReligion-container');
+
+        const personalInfoForm = document.getElementById('personalInfoForm');
+
+        // Input change handler
+        function handleInputChange(field, value) {
+            formData[field] = value;
+            if (errorDisplays[field] && !errorDisplays[field].classList.contains('hidden')) {
+                errorDisplays[field].classList.add('hidden');
+                if (inputs[field].tagName === 'INPUT' || inputs[field].tagName === 'TEXTAREA' || inputs[field].tagName === 'SELECT') {
+                    inputs[field].classList.remove('border-red-500');
+                    inputs[field].classList.add('border-gray-300');
+                }
+            }
+            if (field === 'religiousAffiliation') {
+                otherReligionContainer.classList.toggle('hidden', value !== 'others');
+                if (value !== 'others') {
+                    formData.otherReligion = '';
+                    errorDisplays.otherReligion.classList.add('hidden');
+                    inputs.otherReligion.classList.remove('border-red-500');
+                    inputs.otherReligion.classList.add('border-gray-300');
+                }
+            }
+        }
+
+        function syncFormData() {
+            formData.department = inputs.department.value;
+            formData.faculty = inputs.faculty.value;
+            formData.programme = inputs.programme.value;
+            formData.areaOfSpecialization = inputs.areaOfSpecialization.value;
+            formData.title = Array.from(inputs.title).find(r => r.checked)?.value || '';
+            formData.surname = inputs.surname.value;
+            formData.firstName = inputs.firstName.value;
+            formData.middleName = inputs.middleName.value;
+            formData.mailingAddress = inputs.mailingAddress.value;
+            formData.mobilePhone = inputs.mobilePhone.value;
+            formData.email = inputs.email.value;
+            formData.dateOfBirth = inputs.dateOfBirth.value;
+            formData.placeOfBirth = inputs.placeOfBirth.value;
+            formData.stateOfOrigin = inputs.stateOfOrigin.value;
+            formData.nationality = inputs.nationality.value;
+            formData.gender = Array.from(inputs.gender).find(r => r.checked)?.value || '';
+            formData.maritalStatus = Array.from(inputs.maritalStatus).find(r => r.checked)?.value || '';
+            formData.religiousAffiliation = Array.from(inputs.religiousAffiliation).find(r => r.checked)?.value || '';
+            formData.otherReligion = inputs.otherReligion.value;
+        }
+
+        // Form validation
+        function validateForm() {
+            syncFormData()
+            const errors = {};
+            if (!formData.department) errors.department = "Department is required";
+            if (!formData.faculty) errors.faculty = "Faculty is required";
+            if (!formData.programme) errors.programme = "Programme is required";
+            if (!formData.areaOfSpecialization) errors.areaOfSpecialization = "Area of specialization is required";
+            if (!formData.title) errors.title = "Title is required";
+            if (!formData.surname) errors.surname = "Surname is required";
+            if (!formData.firstName) errors.firstName = "First name is required";
+            if (!formData.mailingAddress) errors.mailingAddress = "Mailing address is required";
+            if (!formData.mobilePhone) errors.mobilePhone = "Mobile phone is required";
+            if (!formData.email) errors.email = "Email is required";
+            if (!formData.dateOfBirth) errors.dateOfBirth = "Date of birth is required";
+            if (!formData.placeOfBirth) errors.placeOfBirth = "Place of birth is required";
+            if (!formData.stateOfOrigin) errors.stateOfOrigin = "State of origin is required";
+            if (!formData.nationality) errors.nationality = "Nationality is required";
+            if (!formData.gender) errors.gender = "Gender is required";
+            if (!formData.maritalStatus) errors.maritalStatus = "Marital status is required";
+            if (!formData.religiousAffiliation) errors.religiousAffiliation = "Religious affiliation is required";
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (formData.email && !emailRegex.test(formData.email)) {
+                errors.email = "Please enter a valid email address";
+            }
+
+            const phoneRegex = /^[0-9+\-\s()]+$/;
+            if (formData.mobilePhone && !phoneRegex.test(formData.mobilePhone)) {
+                errors.mobilePhone = "Please enter a valid phone number";
+            }
+
+            if (formData.religiousAffiliation === "others" && !formData.otherReligion) {
+                errors.otherReligion = "Please specify other religion";
+            }
+
+            Object.keys(errors).forEach(field => {
+                errorDisplays[field].textContent = errors[field];
+                errorDisplays[field].classList.remove('hidden');
+                if (inputs[field].tagName === 'INPUT' || inputs[field].tagName === 'TEXTAREA' || inputs[field].tagName === 'SELECT') {
+                    inputs[field].classList.add('border-red-500');
+                    inputs[field].classList.remove('border-gray-300');
+                }
+            });
+
+            console.log('got here now');
+            console.log('Validation errors:', errors);
+            return Object.keys(errors).length === 0;
+        }
+
+        // Save handler
+        // async function handleSave() {
+        //     if (!validateForm()) return;
+
+        //     isLoading = true;
+        //     saveDraftButton.disabled = true;
+        //     saveDraftButton.textContent = 'Saving...';
+        //     saveContinueButton.disabled = true;
+
+        //     try {
+        //         await new Promise(resolve => setTimeout(resolve, 2000));
+        //         alert("Personal information saved successfully!");
+        //     } catch (error) {
+        //         alert("Failed to save. Please try again.");
+        //     } finally {
+        //         isLoading = false;
+        //         saveDraftButton.disabled = false;
+        //         saveDraftButton.innerHTML = `<i data-lucide="save" class="h-4 w-4 mr-2"></i>Save Draft`;
+        //         saveContinueButton.disabled = false;
+        //         lucide.createIcons();
+        //     }
+        // }
+
+        // Next handler
+        async function handleNext() {
+            if (!validateForm()) return;
+            console.log('got here');
+
+            isLoading = true;
+            saveContinueButton.disabled = true;
+            saveContinueButton.innerHTML = `Saving...<i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>`;
+            // saveDraftButton.disabled = true;
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                alert("Moving to next section. Click Okay...");
+                personalInfoForm.submit()
+            } catch (error) {
+                alert("Failed to save. Please try again.");
+            } finally {
+                isLoading = false;
+                saveContinueButton.disabled = false;
+                saveContinueButton.innerHTML = `Save & Continue<i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>`;
+                // saveDraftButton.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
+        // Event listeners
+        inputs.department.addEventListener('change', (e) => handleInputChange('department', e.target.value));
+        inputs.faculty.addEventListener('change', (e) => handleInputChange('faculty', e.target.value));
+        inputs.programme.addEventListener('change', (e) => handleInputChange('programme', e.target.value));
+        inputs.areaOfSpecialization.addEventListener('input', (e) => handleInputChange('areaOfSpecialization', e.target.value));
+        inputs.title.forEach(input => input.addEventListener('change', (e) => handleInputChange('title', e.target.value)));
+        inputs.surname.addEventListener('input', (e) => handleInputChange('surname', e.target.value));
+        inputs.firstName.addEventListener('input', (e) => handleInputChange('firstName', e.target.value));
+        inputs.middleName.addEventListener('input', (e) => handleInputChange('middleName', e.target.value));
+        inputs.mailingAddress.addEventListener('input', (e) => handleInputChange('mailingAddress', e.target.value));
+        inputs.mobilePhone.addEventListener('input', (e) => handleInputChange('mobilePhone', e.target.value));
+        inputs.email.addEventListener('input', (e) => handleInputChange('email', e.target.value));
+        inputs.dateOfBirth.addEventListener('input', (e) => handleInputChange('dateOfBirth', e.target.value));
+        inputs.placeOfBirth.addEventListener('input', (e) => handleInputChange('placeOfBirth', e.target.value));
+        inputs.stateOfOrigin.addEventListener('change', (e) => handleInputChange('stateOfOrigin', e.target.value));
+        inputs.nationality.addEventListener('input', (e) => handleInputChange('nationality', e.target.value));
+        inputs.gender.forEach(input => input.addEventListener('change', (e) => handleInputChange('gender', e.target.value)));
+        inputs.maritalStatus.forEach(input => input.addEventListener('change', (e) => handleInputChange('maritalStatus', e.target.value)));
+        inputs.religiousAffiliation.forEach(input => input.addEventListener('change', (e) => handleInputChange('religiousAffiliation', e.target.value)));
+        inputs.otherReligion.addEventListener('input', (e) => handleInputChange('otherReligion', e.target.value));
+        // saveDraftButton.addEventListener('click', handleSave);
+        saveContinueButton.addEventListener('click', handleNext);
+    </script>
+</body>
+</html>
