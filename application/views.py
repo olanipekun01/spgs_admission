@@ -613,90 +613,100 @@ def ApplyThree(request):
 
         return render(request, "./application/applythree.html", context)
 
+from django.forms import inlineformset_factory
+from .forms import ProfessionalCredentialForm
+
+ProfessionalCredentialFormSet = inlineformset_factory(
+    ApplicationWorkExperience,
+    ProfessionalCredential,
+    form=ProfessionalCredentialForm,
+    extra=5,  # Provide up to 5 empty forms initially
+    max_num=5,  # Limit to 5 credentials
+    can_delete=True,
+)
+
 def ApplyFour(request):
-    if request.user.is_authenticated:
-        user = request.user
-        applicant = get_object_or_404(Application, applicant=user)
-        current_year = timezone.now().year
-        current_session = Session.objects.filter(is_current=True).first()
-        context = {}
-        application_work_experience = ApplicationWorkExperience.objects.filter(applicant=applicant, session=current_session).first()
+    if not request.user.is_authenticated:
+        return redirect('/')
 
-        if request.method == 'POST':
-            application_work_experience.has_no_credentials = 'no-credentials' in request.POST
-            application_work_experience.save()
+    user = request.user
+    applicant = get_object_or_404(Application, applicant=user)
+    current_year = timezone.now().year
+    current_session = Session.objects.filter(is_current=True).first()
 
-            if application_work_experience.has_no_credentials:
-                ProfessionalCredential.objects.filter(applicant=applicant, session=current_session).delete()
-                action = request.POST.get('action')
-                messages.success(request, "No credentials recorded. Proceeding to next step.")
-                return redirect('/apply/5/')
-                # elif action == 'save':
-                #     application_work_experience.save()
-                #     messages.success(request, "Draft saved successfully.")
-                #     return redirect('/apply/4/')
-            else:
-                credentials_data = []
-                # Collect all credential fields
-                for key, value in request.POST.items():
-                    if key.startswith('credentials[') and key.endswith(']'):
-                        match = re.match(r'credentials\[(\d+)\]\[(.*?)\]', key)
-                        if match:
-                            index, field = match.groups()
-                            if int(index) >= len(credentials_data):
-                                credentials_data.extend([{}] * (int(index) - len(credentials_data) + 1))
-                            credentials_data[int(index)][field] = value
+    # Get or create ApplicationWorkExperience instance
+    application_work_experience, created = ApplicationWorkExperience.objects.get_or_create(
+        applicant=applicant,
+        session=current_session,
+        defaults={'has_no_credentials': False}
+    )
 
-                # Collect all file fields
-                for key in request.FILES.keys():
-                    if key.startswith('credentials[') and key.endswith('][file]'):
-                        match = re.match(r'credentials\[(\d+)\]\[file\]', key)
-                        if match:
-                            index = int(match.group(1))
-                            if index >= len(credentials_data):
-                                credentials_data.extend([{}] * (index - len(credentials_data) + 1))
-                            credentials_data[index]['file'] = request.FILES[key]
+    credentials = ProfessionalCredential.objects.filter(application_work_experience=application_work_experience)
 
-                # Validate and save credentials
-                existing_ids = set(ProfessionalCredential.objects.filter(applicant=applicant, session=current_session).values_list('id', flat=True))
-                for i, data in enumerate(credentials_data):
-                    credential_id = data.get('id') if 'id' in data else None
-                    if credential_id and credential_id in existing_ids:
-                        credential = ProfessionalCredential.objects.get(id=credential_id, applicant=applicant, session=current_session)
-                    else:
-                        credential = ProfessionalCredential(applicant=applicant, session=current_session)
+    if request.method == 'POST':
+        # Handle "No Credentials" checkbox
+        has_no_credentials = 'no-credentials' in request.POST
+        application_work_experience.has_no_credentials = has_no_credentials
+        application_work_experience.save()
 
-                    credential.credential_name = data.get('credential_name', '')
-                    credential.issuing_organization = data.get('issuing_organization', '')
-                    credential.issue_date = data.get('issue_date')
-                    credential.expiry_date = data.get('expiry_date') or None
-                    credential.credential_number = data.get('credential_number', '')
-                    credential.file = data.get('file')
-                    credential.upload_status = 'success' if data.get('file') else 'idle'
-                    credential.session = current_session
+        if has_no_credentials:
+            ProfessionalCredential.objects.filter(application_work_experience=application_work_experience).delete()
+            messages.success(request, "No credentials recorded. Proceeding to next step.")
+            return redirect('/apply/5/')
 
-                    try:
-                        credential.full_clean()
-                        credential.save()
-                    except ValidationError as e:
-                        for field, errors in e.message_dict.items():
-                            for error in errors:
-                                messages.error(request, f"{field.capitalize()}: {error} for credential {i + 1}")
+        # Process up to 3 credentials manually
+        for i in range(1, 4):  # Allow 3 credentials
+            credential_name = request.POST.get(f'credential_name_{i}')
+            issuing_organization = request.POST.get(f'issuing_organization_{i}')
+            issue_date = request.POST.get(f'issue_date_{i}')
+            expiry_date = request.POST.get(f'expiry_date_{i}')
+            credential_number = request.POST.get(f'credential_number_{i}')
 
-                action = request.POST.get('action')
-                # if action == 'next' and not messages.get_messages(request):
-                messages.success(request, "Credentials saved. Proceeding to next step.")
-                return redirect('/apply/5/')
-                # elif action == 'save' and not messages.get_messages(request):
-                #     application_work_experience.save()
-                #     messages.success(request, "Draft saved successfully.")
-                #     return redirect('/apply/4/')
+            if credential_name and issuing_organization and issue_date:  # Required fields
+                try:
+                    issue_date = timezone.datetime.strptime(issue_date, '%Y-%m-%d').date()
+                    expiry_date = timezone.datetime.strptime(expiry_date, '%Y-%m-%d').date() if expiry_date else None
 
-        context = {
-            'credentials': ProfessionalCredential.objects.filter(applicant=applicant, session=current_session),
-            'has_no_credentials': application_work_experience.has_no_credentials,
-            'current_year': current_year,
-        }
+                    # Validate dates
+                    if expiry_date and issue_date and expiry_date <= issue_date:
+                        raise ValidationError("Expiry date must be after issue date.")
+                    if issue_date > timezone.now().date():
+                        raise ValidationError("Issue date cannot be in the future.")
+
+                    # Create or update credential
+                    credential = ProfessionalCredential.objects.create(
+                        application_work_experience=application_work_experience,
+                        session= current_session,
+                        credential_name=credential_name,
+                        issuing_organization= issuing_organization,
+                        issue_date=issue_date,
+                        expiry_date=expiry_date,
+                        credential_number=credential_number
+                    )
+                except ValueError as e:
+                    messages.error(request, f"Invalid date format for Credential {i}: {str(e)}")
+                except ValidationError as e:
+                    messages.error(request, f"Validation error for Credential {i}: {str(e)}")
+
+        # Remove any excess credentials beyond 3
+        # existing_credentials = ProfessionalCredential.objects.filter(application_work_experience=application_work_experience).count()
+        # if existing_credentials > 3:
+        #     excess_credentials = ProfessionalCredential.objects.filter(application_work_experience=application_work_experience)[3:]
+        #     excess_credentials.delete()
+
+        action = request.POST.get('action')
+        if action == 'next':
+            messages.success(request, "Credentials saved. Proceeding to next step.")
+            return redirect('/apply/5/')
+        elif action == 'save':
+            messages.success(request, "Draft saved successfully.")
+            return redirect('/apply/4/')
+
+    context = {
+        'credentials': credentials,
+        'has_no_credentials': application_work_experience.has_no_credentials,
+        'current_year': current_year,
+    }
     return render(request, './application/applyfour.html', context)
 
 def ApplyFive(request):

@@ -7,310 +7,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script>
-        
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
 
-            
-
-            let formData = {
-                credentials: [
-                    {
-                        id: "{{ credentials.0.id|default:'1' }}",
-                        credentialName: "{{ credentials.0.credential_name|default:'' }}",
-                        issuingOrganization: "{{ credentials.0.issuing_organization|default:'' }}",
-                        issueDate: "{{ credentials.0.issue_date|date:'Y-m-d'|default:'' }}",
-                        expiryDate: "{{ credentials.0.expiry_date|date:'Y-m-d'|default:'' }}",
-                        credentialNumber: "{{ credentials.0.credential_number|default:'' }}",
-                        file: null,
-                        fileName: "{{ credentials.0.file|default:'' }}",
-                        uploadStatus: '{{ credentials.0.upload_status|default:"idle" }}'
-                    }
-                ],
-                hasNoCredentials: {{ has_no_credentials|lower }}
-            };
-            
-            let fileInputRefs = {};
-
-            
             const noCredentialsCheckbox = document.getElementById('no-credentials');
             const noCredentialsMessage = document.getElementById('no-credentials-message');
-            const addCredentialButton = document.getElementById('add-credential');
-            const credentialsForm = document.getElementById('credentials-form');
+            const credentialsContainer = document.getElementById('credentials-container');
 
+            // Handle "No Credentials" checkbox change
             function handleNoCredentialsChange(checked) {
-                formData.hasNoCredentials = checked;
                 noCredentialsMessage.style.display = checked ? 'block' : 'none';
                 credentialsContainer.style.display = checked ? 'none' : 'block';
-                if (checked) {
-                    credentialsContainer.innerHTML = '';
-                } else if (!credentialsContainer.children.length) {
-                    addCredentialRecord();
-                }
-                updateErrors();
             }
 
-            function addCredentialRecord() {
-                const id = Date.now().toString();
-                const index = credentialsContainer.children.length;
-                const recordHtml = `
-                    <div class="record-item border rounded-lg p-6 bg-gray-50" data-record-id="${id}">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                                <i data-lucide="award" class="h-4 w-4 mr-2"></i>
-                                Credential ${index + 1}
-                            </h3>
-                            <button type="button" class="remove-record text-red-600 hover:text-red-700 hover:bg-red-50 inline-flex items-center justify-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md">
-                                <i data-lucide="trash-2" class="h-4 w-4 mr-1"></i>
-                                Remove
-                            </button>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="space-y-2">
-                                <label for="credentialName-${id}" class="text-sm font-medium text-gray-700">
-                                    Credential/License Name <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" id="credentialName-${id}" name="credentials[${index}][credential_name]" class="w-full border-gray-300 rounded-md" value="" placeholder="e.g., Project Management Professional (PMP), CPA License">
-                                <input type="hidden" name="credentials[${index}][id]" value="${id}">
-                                <p class="error text-sm text-red-600 hidden" data-error="credentialName"></p>
-                            </div>
-                            <div class="space-y-2">
-                                <label for="issuingOrganization-${id}" class="text-sm font-medium text-gray-700">
-                                    Issuing Organization <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" id="issuingOrganization-${id}" name="credentials[${index}][issuing_organization]" class="w-full border-gray-300 rounded-md" value="" placeholder="e.g., Project Management Institute, State Board of Accountancy">
-                                <p class="error text-sm text-red-600 hidden" data-error="issuingOrganization"></p>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="space-y-2">
-                                    <label for="issueDate-${id}" class="text-sm font-medium text-gray-700">
-                                        Issue Date <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="date" id="issueDate-${id}" name="credentials[${index}][issue_date]" class="w-full border-gray-300 rounded-md" value="">
-                                    <p class="error text-sm text-red-600 hidden" data-error="issueDate"></p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label for="expiryDate-${id}" class="text-sm font-medium text-gray-700">
-                                        Expiry Date <span class="text-gray-500">(if applicable)</span>
-                                    </label>
-                                    <input type="date" id="expiryDate-${id}" name="credentials[${index}][expiry_date]" class="w-full border-gray-300 rounded-md" value="">
-                                    <p class="error text-sm text-red-600 hidden" data-error="expiryDate"></p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label for="credentialNumber-${id}" class="text-sm font-medium text-gray-700">
-                                        Credential Number <span class="text-gray-500">(if applicable)</span>
-                                    </label>
-                                    <input type="text" id="credentialNumber-${id}" name="credentials[${index}][credential_number]" class="w-full border-gray-300 rounded-md" value="" placeholder="License/Certificate number">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700">
-                                    Upload Credential Document <span class="text-red-500">*</span>
-                                </label>
-                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#722F37] transition-colors">
-                                    <input type="file" id="file-${id}" name="credentials[${index}][file]" accept=".pdf" class="hidden" onchange="handleFileUpload('${id}', this)">
-                                    <i data-lucide="upload" class="h-8 w-8 text-gray-400 mx-auto mb-2"></i>
-                                    <p class="text-sm text-gray-600 mb-2">
-                                        Click to upload or drag and drop your credential document
-                                    </p>
-                                    <p class="text-xs text-gray-500 mb-3">PDF files only, max 5MB</p>
-                                    <button type="button" onclick="document.getElementById('file-${id}').click()" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                        <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
-                                        Choose File
-                                    </button>
-                                    {% if credentials %}
-                                        {% for cred in credentials %}
-                                            {% if cred.id|stringformat:"s" == id|stringformat:"s" %}
-                                                {% if cred.file %}
-                                                    <p class="mt-2 text-sm text-gray-600">Current file: {{ cred.file.name }}</p>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                                <div id="file-status-${id}" class="hidden border rounded-lg p-4 bg-white mt-2"></div>
-                                <p class="error text-sm text-red-600 hidden" data-error="file"></p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                credentialsContainer.insertAdjacentHTML('beforeend', recordHtml);
-                lucide.createIcons();
-                fileInputRefs[id] = document.getElementById(`file-${id}`);
-                updateErrors();
-            }
-
-           
-
-           
-
-           
-
-            function validateForm() {
-                errors = {};
-                if (formData.hasNoCredentials) return true;
-                console.log('gothere')
-                const records = credentialsContainer.getElementsByClassName('record-item');
-                if (!records.length) {
-                    alert('Please add at least one credential record or check "No Credentials".');
-                    return false;
-                }
-
-                Array.from(records).forEach((record, index) => {
-                    const id = record.getAttribute('data-record-id');
-                    const credentialName = document.getElementById(`credentialName-${id}`).value.trim();
-                    const issuingOrganization = document.getElementById(`issuingOrganization-${id}`).value.trim();
-                    const issueDate = document.getElementById(`issueDate-${id}`).value;
-                    const expiryDate = document.getElementById(`expiryDate-${id}`).value;
-                    const fileStatus = document.getElementById(`file-status-${id}`).textContent;
-
-                    if (!credentialName) setError(id, 'credentialName', `Credential name is required for credential ${index + 1}`);
-                    if (!issuingOrganization) setError(id, 'issuingOrganization', `Issuing organization is required for credential ${index + 1}`);
-                    if (!issueDate) setError(id, 'issueDate', `Issue date is required for credential ${index + 1}`);
-                    if (issueDate && expiryDate) {
-                        const issue = new Date(issueDate);
-                        const expiry = new Date(expiryDate);
-                        if (expiry <= issue) setError(id, 'expiryDate', `Expiry date must be after issue date for credential ${index + 1}`);
-                    }
-                    if (!fileStatus || !fileStatus.includes('Uploaded')) setError(id, 'file', `Please upload a PDF file for credential ${index + 1}`);
-                });
-
-                return Object.keys(errors).length === 0;
-            }
-
-            addCredentialButton.addEventListener('click', addCredentialRecord);
-
-            
-
-            noCredentialsCheckbox.addEventListener('change', () => handleNoCredentialsChange(noCredentialsCheckbox.checked));
+            noCredentialsCheckbox.addEventListener('change', function() {
+                handleNoCredentialsChange(this.checked);
+            });
             handleNoCredentialsChange(noCredentialsCheckbox.checked);
-
-            // Add event listeners for file inputs dynamically
-            const initialFileInput = document.getElementById('file-1');
-            if (initialFileInput) {
-                initialFileInput.addEventListener('change', (e) => handleFileUpload('1', e.target));
-            }
-
-            
-
-            async function handleNext() {
-                if (!validateForm()) {
-                    console.log('Validation failed');
-                    return;
-                }
-                console.log('Validation passed, submitting form...');
-
-                isLoading = true;
-                addCredentialButton.disabled = true;
-                addCredentialButton.innerHTML = `Saving...<i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>`;
-
-                try {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    credentialsForm.submit();
-                } catch (error) {
-                    console.error('Error submitting form:', error);
-                    alert("Failed to save. Please try again.");
-                } finally {
-                    isLoading = false;
-                    addCredentialButton.disabled = false;
-                    addCredentialButton.innerHTML = `Save & Continue<i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>`;
-                    lucide.createIcons();
-                }
-            }
-
-            document.getElementById('save-continue').addEventListener('click', handleNext);
-            
-            {% if credentials %}
-                credentialsContainer.innerHTML = ''; // Clear default record
-                {% for cred in credentials %}
-                    const id = "{{ cred.id }}";
-                    const index = {{ forloop.counter0 }};
-                    const recordHtml = `
-                        <div class="record-item border rounded-lg p-6 bg-gray-50" data-record-id="${id}">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                                    <i data-lucide="award" class="h-4 w-4 mr-2"></i>
-                                    Credential ${index + 1}
-                                </h3>
-                                <button type="button" class="remove-record text-red-600 hover:text-red-700 hover:bg-red-50 inline-flex items-center justify-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md">
-                                    <i data-lucide="trash-2" class="h-4 w-4 mr-1"></i>
-                                    Remove
-                                </button>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="space-y-2">
-                                    <label for="credentialName-${id}" class="text-sm font-medium text-gray-700">
-                                        Credential/License Name <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" id="credentialName-${id}" name="credentials[${index}][credential_name]" class="w-full border-gray-300 rounded-md" value="{{ cred.credential_name }}" placeholder="e.g., Project Management Professional (PMP), CPA License">
-                                    <input type="hidden" name="credentials[${index}][id]" value="{{ cred.id }}">
-                                    <p class="error text-sm text-red-600 hidden" data-error="credentialName"></p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label for="issuingOrganization-${id}" class="text-sm font-medium text-gray-700">
-                                        Issing Organization <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" id="issuingOrganization-${id}" name="credentials[${index}][issuing_organization]" class="w-full border-gray-300 rounded-md" value="{{ cred.issuing_organization }}" placeholder="e.g., Project Management Institute, State Board of Accountancy">
-                                    <p class="error text-sm text-red-600 hidden" data-error="issuingOrganization"></p>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div class="space-y-2">
-                                        <label for="issueDate-${id}" class="text-sm font-medium text-gray-700">
-                                            Issue Date <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="date" id="issueDate-${id}" name="credentials[${index}][issue_date]" class="w-full border-gray-300 rounded-md" value="{{ cred.issue_date|date:'Y-m-d' }}">
-                                        <p class="error text-sm text-red-600 hidden" data-error="issueDate"></p>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label for="expiryDate-${id}" class="text-sm font-medium text-gray-700">
-                                            Expiry Date <span class="text-gray-500">(if applicable)</span>
-                                        </label>
-                                        <input type="date" id="expiryDate-${id}" name="credentials[${index}][expiry_date]" class="w-full border-gray-300 rounded-md" value="{{ cred.expiry_date|date:'Y-m-d'|default:'' }}">
-                                        <p class="error text-sm text-red-600 hidden" data-error="expiryDate"></p>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label for="credentialNumber-${id}" class="text-sm font-medium text-gray-700">
-                                            Credential Number <span class="text-gray-500">(if applicable)</span>
-                                        </label>
-                                        <input type="text" id="credentialNumber-${id}" name="credentials[${index}][credential_number]" class="w-full border-gray-300 rounded-md" value="{{ cred.credential_number }}" placeholder="License/Certificate number">
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">
-                                        Upload Credential Document <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#722F37] transition-colors">
-                                        <input type="file" id="file-${id}" name="credentials[${index}][file]" accept=".pdf" class="hidden" onchange="handleFileUpload('${id}', this)">
-                                        <i data-lucide="upload" class="h-8 w-8 text-gray-400 mx-auto mb-2"></i>
-                                        <p class="text-sm text-gray-600 mb-2">
-                                            Click to upload or drag and drop your credential document
-                                        </p>
-                                        <p class="text-xs text-gray-500 mb-3">PDF files only, max 5MB</p>
-                                        <button type="button" onclick="document.getElementById('file-${id}').click()" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                            <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
-                                            Choose File
-                                        </button>
-                                        {% if cred.file %}
-                                            <p class="mt-2 text-sm text-gray-600">Current file: {{ cred.file.name }}</p>
-                                        {% endif %}
-                                    </div>
-                                    <div id="file-status-${id}" class="hidden border rounded-lg p-4 bg-white mt-2"></div>
-                                    <p class="error text-sm text-red-600 hidden" data-error="file"></p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    credentialsContainer.insertAdjacentHTML('beforeend', recordHtml);
-                    lucide.createIcons();
-                    fileInputRefs[id] = document.getElementById(`file-${id}`);
-                    updateErrors();
-                {% endfor %}
-            {% endif %}
         });
     </script>
 </head>
 <body class="min-h-screen bg-gray-50 flex flex-col">
-    <!-- Header -->
     <header class="bg-white shadow-sm border-b">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
@@ -341,7 +58,6 @@
         </div>
     </header>
 
-    <!-- Progress Bar -->
     <div class="bg-white border-b">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between mb-2">
@@ -354,43 +70,38 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">Professional Credentials</h1>
             <p class="text-gray-600">
-                List all your professional credentials and licenses if applicable. Upload PDF copies of each credential.
+                List all your professional credentials and licenses if applicable. Maximum of 3 credentials allowed.
             </p>
         </div>
 
-        <!-- Instructions -->
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
             <div class="flex items-start">
                 <i data-lucide="alert-circle" class="h-5 w-5 text-blue-500 mr-3 mt-0.5"></i>
                 <div>
-                    <h4 class="font-medium text-blue-800 mb-1">Upload Requirements</h4>
+                    <h4 class="font-medium text-blue-800 mb-1">Instructions</h4>
                     <ul class="text-sm text-blue-700 space-y-1">
-                        <li>• Upload clear, legible PDF copies of your credentials</li>
-                        <li>• File size must be less than 5MB per document</li>
-                        <li>• Include professional licenses, certifications, and memberships</li>
-                        <li>• Ensure all text and details are clearly visible</li>
+                        <li>• Provide accurate details for each credential.</li>
+                        <li>• Maximum of 3 credentials are allowed.</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <form id="credentials-form" method="post" action="/apply/4/" enctype="multipart/form-data">
+        <form method="post" action="/apply/4/" id="credentials-form">
             {% csrf_token %}
-            <!-- No Credentials Option -->
             <div class="bg-white shadow-lg border-0 rounded-lg mb-8">
                 <div class="p-6">
                     <div class="flex items-center space-x-3">
-                        <input type="checkbox" id="no-credentials" {% if has_no_credentials %}checked{% endif %} name="no-credentials" class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded" onchange="handleNoCredentialsChange(this.checked)">
+                        <input type="checkbox" id="no-credentials" name="no-credentials" {% if has_no_credentials %}checked{% endif %} class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded">
                         <label for="no-credentials" class="text-sm font-medium text-gray-700">
                             I have no professional credentials or licenses to report
                         </label>
                     </div>
-                    <div id="no-credentials-message" class="mt-3 p-3 bg-gray-50 rounded-lg hidden">
+                    <div id="no-credentials-message" class="mt-3 p-3 bg-gray-50 rounded-lg {% if not has_no_credentials %}hidden{% endif %}">
                         <p class="text-sm text-gray-600">
                             You have indicated that you have no professional credentials. You can proceed to the next section.
                         </p>
@@ -398,93 +109,145 @@
                 </div>
             </div>
 
-            <!-- Professional Credentials -->
-            <div id="credentials-container" class="space-y-8">
-                <div class="record-item border rounded-lg p-6 bg-gray-50" data-record-id="1">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                            <i data-lucide="award" class="h-4 w-4 mr-2"></i>
-                            Credential 1
-                        </h3>
-                    </div>
+            <div id="credentials-container" class="space-y-8 {% if has_no_credentials %}hidden{% endif %}">
+                <!-- Credential 1 -->
+                <div class="record-item border rounded-lg p-6 bg-gray-50 mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i data-lucide="award" class="h-4 w-4 mr-2"></i>
+                        Credential 1
+                    </h3>
                     <div class="space-y-4">
                         <div class="space-y-2">
-                            <label for="credentialName-1" class="text-sm font-medium text-gray-700">
+                            <label for="credential_name_1" class="text-sm font-medium text-gray-700">
                                 Credential/License Name <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="credentialName-1" name="credentials[0][credential_name]" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Professional (PMP), CPA License">
-                            <p class="error text-sm text-red-600 hidden" data-error="credentialName"></p>
+                            <input type="text" value="{{credentials[0].credential_name}}" name="credential_name_1" id="credential_name_1" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Professional (PMP), CPA License">
                         </div>
                         <div class="space-y-2">
-                            <label for="issuingOrganization-1" class="text-sm font-medium text-gray-700">
+                            <label for="issuing_organization_1" class="text-sm font-medium text-gray-700">
                                 Issuing Organization <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="issuingOrganization-1" name="credentials[0][issuing_organization]" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Institute, State Board of Accountancy">
-                            <p class="error text-sm text-red-600 hidden" data-error="issuingOrganization"></p>
+                            <input type="text" name="issuing_organization_1" id="issuing_organization_1" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Institute, State Board of Accountancy">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="space-y-2">
-                                <label for="issueDate-1" class="text-sm font-medium text-gray-700">
+                                <label for="issue_date_1" class="text-sm font-medium text-gray-700">
                                     Issue Date <span class="text-red-500">*</span>
                                 </label>
-                                <input type="date" id="issueDate-1" name="credentials[0][issue_date]" class="w-full border-gray-300 rounded-md">
-                                <p class="error text-sm text-red-600 hidden" data-error="issueDate"></p>
+                                <input type="date" name="issue_date_1" id="issue_date_1" class="w-full border-gray-300 rounded-md">
                             </div>
                             <div class="space-y-2">
-                                <label for="expiryDate-1" class="text-sm font-medium text-gray-700">
+                                <label for="expiry_date_1" class="text-sm font-medium text-gray-700">
                                     Expiry Date <span class="text-gray-500">(if applicable)</span>
                                 </label>
-                                <input type="date" id="expiryDate-1" name="credentials[0][expiry_date]" class="w-full border-gray-300 rounded-md">
-                                <p class="error text-sm text-red-600 hidden" data-error="expiryDate"></p>
+                                <input type="date" name="expiry_date_1" id="expiry_date_1" class="w-full border-gray-300 rounded-md">
                             </div>
                             <div class="space-y-2">
-                                <label for="credentialNumber-1" class="text-sm font-medium text-gray-700">
+                                <label for="credential_number_1" class="text-sm font-medium text-gray-700">
                                     Credential Number <span class="text-gray-500">(if applicable)</span>
                                 </label>
-                                <input type="text" id="credentialNumber-1" name="credentials[0][credential_number]" class="w-full border-gray-300 rounded-md" placeholder="License/Certificate number">
+                                <input type="text" name="credential_number_1" id="credential_number_1" class="w-full border-gray-300 rounded-md" placeholder="License/Certificate number">
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Credential 2 -->
+                <div class="record-item border rounded-lg p-6 bg-gray-50 mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i data-lucide="award" class="h-4 w-4 mr-2"></i>
+                        Credential 2
+                    </h3>
+                    <div class="space-y-4">
                         <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-700">
-                                Upload Credential Document <span class="text-red-500">*</span>
+                            <label for="credential_name_2" class="text-sm font-medium text-gray-700">
+                                Credential/License Name <span class="text-red-500">*</span>
                             </label>
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#722F37] transition-colors">
-                                <input type="file" id="file-1" name="credentials[0][file]" accept=".pdf" class="hidden" onchange="handleFileUpload('1', this)">
-                                <i data-lucide="upload" class="h-8 w-8 text-gray-400 mx-auto mb-2"></i>
-                                <p class="text-sm text-gray-600 mb-2">
-                                    Click to upload or drag and drop your credential document
-                                </p>
-                                <p class="text-xs text-gray-500 mb-3">PDF files only, max 5MB</p>
-                                <button type="button" onclick="document.getElementById('file-1').click()" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                    <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
-                                    Choose File
-                                </button>
+                            <input type="text" name="credential_name_2" id="credential_name_2" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Professional (PMP), CPA License">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="issuing_organization_2" class="text-sm font-medium text-gray-700">
+                                Issuing Organization <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="issuing_organization_2" id="issuing_organization_2" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Institute, State Board of Accountancy">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="space-y-2">
+                                <label for="issue_date_2" class="text-sm font-medium text-gray-700">
+                                    Issue Date <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" name="issue_date_2" id="issue_date_2" class="w-full border-gray-300 rounded-md">
                             </div>
-                            <div id="file-status-1" class="hidden border rounded-lg p-4 bg-white mt-2"></div>
-                            <p class="error text-sm text-red-600 hidden" data-error="file"></p>
+                            <div class="space-y-2">
+                                <label for="expiry_date_2" class="text-sm font-medium text-gray-700">
+                                    Expiry Date <span class="text-gray-500">(if applicable)</span>
+                                </label>
+                                <input type="date" name="expiry_date_2" id="expiry_date_2" class="w-full border-gray-300 rounded-md">
+                            </div>
+                            <div class="space-y-2">
+                                <label for="credential_number_2" class="text-sm font-medium text-gray-700">
+                                    Credential Number <span class="text-gray-500">(if applicable)</span>
+                                </label>
+                                <input type="text" name="credential_number_2" id="credential_number_2" class="w-full border-gray-300 rounded-md" placeholder="License/Certificate number">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credential 3 -->
+                <div class="record-item border rounded-lg p-6 bg-gray-50 mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i data-lucide="award" class="h-4 w-4 mr-2"></i>
+                        Credential 3
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label for="credential_name_3" class="text-sm font-medium text-gray-700">
+                                Credential/License Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="credential_name_3" id="credential_name_3" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Professional (PMP), CPA License">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="issuing_organization_3" class="text-sm font-medium text-gray-700">
+                                Issuing Organization <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="issuing_organization_3" id="issuing_organization_3" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Institute, State Board of Accountancy">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="space-y-2">
+                                <label for="issue_date_3" class="text-sm font-medium text-gray-700">
+                                    Issue Date <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" name="issue_date_3" id="issue_date_3" class="w-full border-gray-300 rounded-md">
+                            </div>
+                            <div class="space-y-2">
+                                <label for="expiry_date_3" class="text-sm font-medium text-gray-700">
+                                    Expiry Date <span class="text-gray-500">(if applicable)</span>
+                                </label>
+                                <input type="date" name="expiry_date_3" id="expiry_date_3" class="w-full border-gray-300 rounded-md">
+                            </div>
+                            <div class="space-y-2">
+                                <label for="credential_number_3" class="text-sm font-medium text-gray-700">
+                                    Credential Number <span class="text-gray-500">(if applicable)</span>
+                                </label>
+                                <input type="text" name="credential_number_3" id="credential_number_3" class="w-full border-gray-300 rounded-md" placeholder="License/Certificate number">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Add Credential Button -->
-            <button id="add-credential" type="button" class="w-full border-dashed border-2 border-gray-300 hover:border-[#722F37] hover:bg-[#722F37]/5 py-4 flex items-center justify-center text-sm font-medium text-gray-700">
-                <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
-                Add Another Credential
-            </button>
-
-            <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-4 pt-6">
                 <button type="button" onclick="window.history.back()" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                     <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
                     Previous Step
                 </button>
                 <div class="flex gap-3 sm:ml-auto">
-                    <!-- <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                         <i data-lucide="save" class="h-4 w-4 mr-2"></i>
                         Save Draft
-                    </button> -->
-                    <button type="button" id="save-continue" name="action" value="next" class="bg-[#722F37] hover:bg-[#5a252a] text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
+                    </button>
+                    <button type="submit" name="action" value="next" class="bg-[#722F37] hover:bg-[#5a252a] text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
                         Save & Continue
                         <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
                     </button>
@@ -493,113 +256,12 @@
         </form>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-white border-t mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="text-center text-sm text-gray-500">
-                <p>&copy; 2024 School of Postgraduate Achievers. All rights reserved.</p>
+                <p>&copy; 2025 School of Postgraduate Achievers. All rights reserved.</p>
             </div>
         </div>
     </footer>
-
-    <script>
-        const credentialsContainer = document.getElementById('credentials-container');
-        let errors = {};
-         function setError(id, field, message) {
-                if (message) {
-                    errors[`${id}-${field}`] = message;
-                } else {
-                    delete errors[`${id}-${field}`];
-                }
-                updateErrors();
-            }
-
-            function updateErrors() {
-                const records = credentialsContainer.getElementsByClassName('record-item');
-                for (let record of records) {
-                    const id = record.getAttribute('data-record-id');
-                    for (let [key, message] of Object.entries(errors)) {
-                        if (key.startsWith(`${id}-`)) {
-                            const field = key.split('-')[1];
-                            const errorElement = record.querySelector(`[data-error="${field}"]`);
-                            if (errorElement) {
-                                errorElement.textContent = message;
-                                errorElement.classList.toggle('hidden', !message);
-                            }
-                        }
-                    }
-                }
-            }
-
-
-         function handleFileUpload(id, input) {
-                const file = input.files?.[0];
-                if (!file) return;
-
-                if (file.type !== 'application/pdf') {
-                    setError(id, 'file', 'Only PDF files are allowed');
-                    return;
-                }
-
-                if (file.size > 5 * 1024 * 1024) {
-                    setError(id, 'file', 'File size must be less than 5MB');
-                    return;
-                }
-
-                const statusDiv = document.getElementById(`file-status-${id}`);
-                statusDiv.innerHTML = '<div class="flex items-center text-blue-600"><div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div><span class="text-xs">Uploading...</span></div>';
-                statusDiv.classList.remove('hidden');
-
-                setTimeout(() => {
-                    statusDiv.innerHTML = '<div class="flex items-center text-green-600"><i data-lucide="check-circle" class="h-4 w-4 mr-1"></i><span class="text-xs">Uploaded</span></div>';
-                    setError(id, 'file', null);
-                }, 2000);
-            }
-
-            credentialsContainer.addEventListener('click', (e) => {
-                if (e.target.closest('.remove-record')) {
-                    const id = e.target.closest('.record-item').getAttribute('data-record-id');
-                    removeCredentialRecord(id);
-                }
-            });
-
-             function removeCredentialRecord(id) {
-                if (credentialsContainer.children.length > 1) {
-                    const record = credentialsContainer.querySelector(`[data-record-id="${id}"]`);
-                    if (record) record.remove();
-                    delete errors[id];
-                    delete fileInputRefs[id];
-                    updateRecordIndices();
-                    updateErrors();
-                }
-            }
-
-            function updateRecordIndices() {
-                const records = credentialsContainer.getElementsByClassName('record-item');
-                Array.from(records).forEach((record, index) => {
-                    const id = record.getAttribute('data-record-id');
-                    const h3 = record.querySelector('h3');
-                    if (h3) h3.textContent = `Credential ${index + 1}`;
-                    const inputs = record.getElementsByTagName('input');
-                    for (let input of inputs) {
-                        if (input.id) {
-                            const newId = input.id.replace(/-\d+$/, `-${index + 1}`);
-                            input.id = newId;
-                            if (input.name) {
-                                const newName = input.name.replace(/\[\d+\]/, `[${index}]`);
-                                input.name = newName;
-                            }
-                        }
-                    }
-
-                    // Update file input reference
-                    if (fileInputRefs[id]) {
-                        fileInputRefs[id].id = `file-${index + 1}`;
-                        fileInputRefs[id].name = `credentials[${index}][file]`;
-                        fileInputRefs[id] = document.getElementById(`file-${index + 1}`);
-                    }
-                });
-            }
-    </script>
 </body>
 </html>

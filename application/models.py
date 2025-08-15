@@ -16,6 +16,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+from django.core.validators import FileExtensionValidator
 
 
 class Application(models.Model):
@@ -228,25 +229,22 @@ class ApplicationWorkExperience(models.Model):
     def __str__(self):
         return f"Work Experience for {self.applicant}"
 
+
+from django.db import models
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import ApplicationWorkExperience
+
 class ProfessionalCredential(models.Model):
-    applicant = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='credentials')
+    application_work_experience = models.ForeignKey(ApplicationWorkExperience, on_delete=models.CASCADE, blank=True, null=True, related_name='credentials')
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
     credential_name = models.CharField(max_length=255, blank=False)
     issuing_organization = models.CharField(max_length=255, blank=False)
     issue_date = models.DateField(blank=False)
     expiry_date = models.DateField(null=True, blank=True)
     credential_number = models.CharField(max_length=100, blank=True)
-    file = models.FileField(upload_to='credentials/', null=True, blank=True)
-    upload_status = models.CharField(
-        max_length=20,
-        choices=[
-            ('idle', 'Idle'),
-            ('uploading', 'Uploading'),
-            ('success', 'Success'),
-            ('error', 'Error')
-        ],
-        default='idle'
-    )
 
     class Meta:
         verbose_name = "Professional Credential"
@@ -261,10 +259,8 @@ class ProfessionalCredential(models.Model):
             raise ValidationError("Expiry date must be after issue date.")
         if self.issue_date and self.issue_date > timezone.now().date():
             raise ValidationError("Issue date cannot be in the future.")
-        if self.file and self.file.size > 5 * 1024 * 1024:
-            raise ValidationError("File size must be less than 5MB.")
-        if self.file and not self.file.name.endswith('.pdf'):
-            raise ValidationError("Only PDF files are allowed.")
+
+
 
 class NextOfKin(models.Model):
     RELATIONSHIP_CHOICES = [ 

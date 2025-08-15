@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'app',
     'common',
     'application',
+    'spgs_admission',
 ]
 
 MIDDLEWARE = [
