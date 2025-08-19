@@ -644,23 +644,17 @@ def ApplyFour(request):
     credentials = ProfessionalCredential.objects.filter(application_work_experience=application_work_experience)
 
     if request.method == 'POST':
-        # Handle "No Credentials" checkbox
-        has_no_credentials = 'no-credentials' in request.POST
-        application_work_experience.has_no_credentials = has_no_credentials
-        application_work_experience.save()
-
-        if has_no_credentials:
-            ProfessionalCredential.objects.filter(application_work_experience=application_work_experience).delete()
-            messages.success(request, "No credentials recorded. Proceeding to next step.")
+        action = request.POST.get('action')
+        if action == 'next':
+            messages.success(request, "Credentials saved. Proceeding to next step.")
             return redirect('/apply/5/')
-
-        # Process up to 3 credentials manually
-        for i in range(1, 4):  # Allow 3 credentials
-            credential_name = request.POST.get(f'credential_name_{i}')
-            issuing_organization = request.POST.get(f'issuing_organization_{i}')
-            issue_date = request.POST.get(f'issue_date_{i}')
-            expiry_date = request.POST.get(f'expiry_date_{i}')
-            credential_number = request.POST.get(f'credential_number_{i}')
+        
+        elif action == 'save':
+            credential_name = request.POST.get(f'credential_name')
+            issuing_organization = request.POST.get(f'issuing_organization')
+            issue_date = request.POST.get(f'issue_date')
+            expiry_date = request.POST.get(f'expiry_date')
+            credential_number = request.POST.get(f'credential_number')
 
             if credential_name and issuing_organization and issue_date:  # Required fields
                 try:
@@ -684,30 +678,70 @@ def ApplyFour(request):
                         credential_number=credential_number
                     )
                 except ValueError as e:
-                    messages.error(request, f"Invalid date format for Credential {i}: {str(e)}")
+                    messages.error(request, f"Invalid date format for Credential: {str(e)}")
                 except ValidationError as e:
-                    messages.error(request, f"Validation error for Credential {i}: {str(e)}")
+                    messages.error(request, f"Validation error for Credential: {str(e)}")
 
-        # Remove any excess credentials beyond 3
-        # existing_credentials = ProfessionalCredential.objects.filter(application_work_experience=application_work_experience).count()
-        # if existing_credentials > 3:
-        #     excess_credentials = ProfessionalCredential.objects.filter(application_work_experience=application_work_experience)[3:]
-        #     excess_credentials.delete()
+            # Remove any excess credentials beyond 3
+            # existing_credentials = ProfessionalCredential.objects.filter(application_work_experience=application_work_experience).count()
+            # if existing_credentials > 3:
+            #     excess_credentials = ProfessionalCredential.objects.filter(application_work_experience=application_work_experience)[3:]
+            #     excess_credentials.delete()
 
-        action = request.POST.get('action')
-        if action == 'next':
-            messages.success(request, "Credentials saved. Proceeding to next step.")
-            return redirect('/apply/5/')
-        elif action == 'save':
-            messages.success(request, "Draft saved successfully.")
-            return redirect('/apply/4/')
-
+                messages.success(request, "Credentials saved successfully.")
+                return redirect('/apply/4/')
+        
     context = {
         'credentials': credentials,
         'has_no_credentials': application_work_experience.has_no_credentials,
         'current_year': current_year,
     }
     return render(request, './application/applyfour.html', context)
+
+
+
+def CredDelete(request, id):
+    if request.user.is_authenticated:
+        user = request.user
+        cred = get_object_or_404(ProfessionalCredential, id=id)
+        cred.delete()
+        
+        messages.success(request, "Credentials deleted!")
+        return redirect('/apply/4/')
+
+
+def CredUpdate(request):
+    if request.user.is_authenticated:
+        user = request.user
+
+        if request.method == 'POST':
+            cred_name = request.POST.get("cred_name", "")
+            issuing_organization = request.POST.get("issuing_organization", "")
+            issue_date = request.POST.get("issue_date", "")
+            expiry_date = request.POST.get("expiry_date", "")
+            cred_number = request.POST.get("cred_number", "")
+            cred_id = request.POST.get("cred_id", "")
+            print(cred_id)
+            try:
+                credential = get_object_or_404(ProfessionalCredential, id=cred_id)
+
+                credential.credential_name = cred_name
+                credential.issuing_organization = issuing_organization
+                credential.issue_date = issue_date
+                credential.expiry_date = expiry_date
+                credential.credential_number = cred_number
+
+                credential.save()
+                messages.success(request, "Credentials Updated!")
+                return redirect('/apply/4/')
+            except ValueError as e:
+                messages.error(request, f"Invalid Credential!: {str(e)}")
+                return redirect('/apply/4/')
+            except ValidationError as e:
+                messages.error(request, f"Invalid Credential!: {str(e)}")
+                return redirect('/apply/4/')
+
+            
 
 def ApplyFive(request):
     if request.user.is_authenticated:

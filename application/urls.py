@@ -29,7 +29,12 @@ urlpatterns = [
     path('apply/1/', views.ApplyOne, name="applyone"),
     path('apply/2/', views.ApplyTwo, name="applytwo"),
     path('apply/3/', views.ApplyThree, name="applythree"),
+
     path('apply/4/', views.ApplyFour, name="applyfour"),
+    path('cred/delete/<str:id>/', views.CredDelete, name="cred_delete"),
+    path('cred/update/', views.CredUpdate, name="cred_update"),
+    
+
     path('apply/5/', views.ApplyFive, name="applyfive"),
     path('apply/6/', views.ApplySix, name="applysix"),
     path('apply/7/', views.ApplySeven, name="applyseven"),

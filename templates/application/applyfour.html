@@ -25,7 +25,232 @@
             });
             handleNoCredentialsChange(noCredentialsCheckbox.checked);
         });
+
+        function convertDateFormat(dateStr) {
+            // Parse the input date string
+            const months = {
+                'Jan.': '01', 'Feb.': '02', 'Mar.': '03', 'Apr.': '04',
+                'May.': '05', 'Jun.': '06', 'Jul.': '07', 'Aug.': '08',
+                'Sep.': '09', 'Oct.': '10', 'Nov.': '11', 'Dec.': '12'
+            };
+
+            const [monthAbbr, day, year] = dateStr.split('. ');
+            const month = months[monthAbbr + '.'];
+            const formattedDay = day.padStart(2, '0'); // Ensure two digits (e.g., "01" instead of "1")
+            const formattedDate = `${year}-${month}-${formattedDay}`;
+
+            return formattedDate;
+        }
+
+        function handleUpdateModal(name, issuing_organization, issue_date, expiry_date, credential_number, id) {
+            document.querySelector(".update_credentials").style.display = "block";
+            document.querySelector(".background_wrapper").style.display = "block";
+            document.querySelector('#cred_name').value = name;
+            document.querySelector('#issue_organization').value = issuing_organization;
+            document.querySelector('#issue_date').value = convertDateFormat(issue_date);  
+            document.querySelector('#expiry_date').value = convertDateFormat(expiry_date);  
+            document.querySelector('#cred_number').value = credential_number;  
+            document.querySelector('#updateModelId').value = id;
+            
+        }
+
+        function closeUpdateModal() {
+            event.preventDefault();
+            document.querySelector(".update_credentials").style.display = "none";
+            document.querySelector(".background_wrapper").style.display = "none";
+        }
     </script>
+
+    <style>
+         .update_credentials {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #C3C4CE;
+            padding: 20px 20px;
+            width: 550px;
+            height: 700px;
+            border-radius: 20px;
+            display: none;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+        }
+
+        .create_programme form input, .update_credentials form input {
+            /* width: 220px; */
+            width: 100%;
+            height: 50px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            padding-left: 25px;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+        .create_programme form select, .update_credentials form select {
+            width: 250px;
+            height: 30px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            padding-left: 20px;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* .create_programme form .checkbox_wrapper {} */
+
+        .create_programme form .checkbox_card, .update_credentials form .checkbox_card {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .create_programme form label, .update_credentials form label {
+            color: #545F7D;
+            /* padding: 12px 15px; */
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .create_programme form label.depts_checkbox,
+        .update_credentials form label.depts_checkbox {
+            font-size: 23px;
+            /* margin-bottom: 20px; */
+        }
+
+        .create_programme form input.checkbx,
+        .update_credentials form input.checkbx {
+            width: 15px;
+            height: 15px;
+            border-radius: 25px;
+            border: none;
+            margin: 0 0;
+        }
+
+        .create_programme form .checkbx_label, 
+        .update_credentials form .checkbx_label {
+            margin-left: 10px;
+        }
+
+        .create_programme form button,
+        .update_credentials form button {
+            font-size: 18px;
+            padding: 6px 0px;
+            width: 100%;
+            border-radius: 25px;
+            border: none;
+            margin-bottom: 20px;
+            color: white;
+            background: rgb(4, 134, 70);
+
+        }
+
+        .create_programme form button:hover,
+        .update_credentials form button:hover {
+            color: rgb(4, 134, 70);
+            background: white;
+        }
+
+        .create_programme .cancel_btn,
+        .update_credentials .cancel_btn {
+            font-size: 18px;
+            padding: 6px 0px;
+            width: 100%;
+            border-radius: 25px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .create_programme .cancel_btn:hover,
+        .update_credentials .cancel_btn:hover {
+            font-weight: 700;
+            color: red;
+        }
+
+        .deletePopOut {
+            background-color: #C3C4CE;
+            padding: 20px 20px;
+            min-width: 350px;
+            width: auto;
+            height: auto; /* Adapt to content */
+            border-radius: 20px;
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow-y: auto;
+            z-index: 1001;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .deletePopOut p {
+            color: #1E2875;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .deletePopOut .btn_wrapper {
+            display: flex;
+            width: 160px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .deletePopOut .btn_wrapper button {
+            background: #1E2875;
+            color: white;
+            width: 70px;
+            font-size: 17px;
+            font-weight: 500;
+            padding: 10px 0;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .deletePopOut .btn_wrapper button.danger {
+            background: red;
+        }
+
+        .deletePopOut .btn_wrapper button.danger a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .deletePopOut .btn_wrapper button.danger:hover {
+            letter-spacing: 1.5px;
+            background: white;
+            color: red;
+        }
+
+        .deletePopOut .btn_wrapper button.danger:hover a {
+            color: red;
+        }
+
+        .deletePopOut .btn_wrapper button.cancel_btnPopOut:hover {
+            letter-spacing: 1.5px;
+            background: white;
+            color: #1E2875;
+        }
+
+        .background_wrapper {
+            position: fixed; /* Fix to viewport */
+            left: 0;
+            top: 0;
+            width: 100vw; /* Full viewport width */
+            height: 100vh; /* Full viewport height */
+            background: rgba(4, 134, 70, 0.5); /* Semi-transparent green */
+            backdrop-filter: blur(5px); /* Blur effect */
+            display: none; /* Hidden by default */
+            z-index: 1000; /* Ensure it’s above other content */
+        }
+    </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex flex-col">
     <header class="bg-white shadow-sm border-b">
@@ -71,6 +296,9 @@
     </div>
 
     <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+     {% for message in messages %}
+            <h5 style="color: red">{{message}}</h5>
+        {% endfor %}
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">Professional Credentials</h1>
             <p class="text-gray-600">
@@ -93,7 +321,7 @@
 
         <form method="post" action="/apply/4/" id="credentials-form">
             {% csrf_token %}
-            <div class="bg-white shadow-lg border-0 rounded-lg mb-8">
+            {% comment %} <div class="bg-white shadow-lg border-0 rounded-lg mb-8">
                 <div class="p-6">
                     <div class="flex items-center space-x-3">
                         <input type="checkbox" id="no-credentials" name="no-credentials" {% if has_no_credentials %}checked{% endif %} class="h-4 w-4 text-[#722F37] focus:ring-[#722F37] border-gray-300 rounded">
@@ -107,134 +335,54 @@
                         </p>
                     </div>
                 </div>
-            </div>
+            </div> {% endcomment %}
 
             <div id="credentials-container" class="space-y-8 {% if has_no_credentials %}hidden{% endif %}">
                 <!-- Credential 1 -->
-                <div class="record-item border rounded-lg p-6 bg-gray-50 mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                        <i data-lucide="award" class="h-4 w-4 mr-2"></i>
-                        Credential 1
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="space-y-2">
-                            <label for="credential_name_1" class="text-sm font-medium text-gray-700">
-                                Credential/License Name <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" value="{{credentials[0].credential_name}}" name="credential_name_1" id="credential_name_1" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Professional (PMP), CPA License">
-                        </div>
-                        <div class="space-y-2">
-                            <label for="issuing_organization_1" class="text-sm font-medium text-gray-700">
-                                Issuing Organization <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="issuing_organization_1" id="issuing_organization_1" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Institute, State Board of Accountancy">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="space-y-2">
-                                <label for="issue_date_1" class="text-sm font-medium text-gray-700">
-                                    Issue Date <span class="text-red-500">*</span>
-                                </label>
-                                <input type="date" name="issue_date_1" id="issue_date_1" class="w-full border-gray-300 rounded-md">
-                            </div>
-                            <div class="space-y-2">
-                                <label for="expiry_date_1" class="text-sm font-medium text-gray-700">
-                                    Expiry Date <span class="text-gray-500">(if applicable)</span>
-                                </label>
-                                <input type="date" name="expiry_date_1" id="expiry_date_1" class="w-full border-gray-300 rounded-md">
-                            </div>
-                            <div class="space-y-2">
-                                <label for="credential_number_1" class="text-sm font-medium text-gray-700">
-                                    Credential Number <span class="text-gray-500">(if applicable)</span>
-                                </label>
-                                <input type="text" name="credential_number_1" id="credential_number_1" class="w-full border-gray-300 rounded-md" placeholder="License/Certificate number">
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Credential 2 -->
                 <div class="record-item border rounded-lg p-6 bg-gray-50 mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 flex items-center">
                         <i data-lucide="award" class="h-4 w-4 mr-2"></i>
-                        Credential 2
+                        Enter Credential
                     </h3>
                     <div class="space-y-4">
                         <div class="space-y-2">
-                            <label for="credential_name_2" class="text-sm font-medium text-gray-700">
+                            <label for="credential_name" class="text-sm font-medium text-gray-700">
                                 Credential/License Name <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" name="credential_name_2" id="credential_name_2" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Professional (PMP), CPA License">
+                            <input type="text" name="credential_name" id="credential_name" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Professional (PMP), CPA License">
                         </div>
                         <div class="space-y-2">
-                            <label for="issuing_organization_2" class="text-sm font-medium text-gray-700">
+                            <label for="issuing_organization" class="text-sm font-medium text-gray-700">
                                 Issuing Organization <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" name="issuing_organization_2" id="issuing_organization_2" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Institute, State Board of Accountancy">
+                            <input type="text" name="issuing_organization" id="issuing_organization" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Institute, State Board of Accountancy">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="space-y-2">
-                                <label for="issue_date_2" class="text-sm font-medium text-gray-700">
+                                <label for="issue_date" class="text-sm font-medium text-gray-700">
                                     Issue Date <span class="text-red-500">*</span>
                                 </label>
-                                <input type="date" name="issue_date_2" id="issue_date_2" class="w-full border-gray-300 rounded-md">
+                                <input type="date" name="issue_date" id="issue_date" class="w-full border-gray-300 rounded-md">
                             </div>
                             <div class="space-y-2">
-                                <label for="expiry_date_2" class="text-sm font-medium text-gray-700">
+                                <label for="expiry_date" class="text-sm font-medium text-gray-700">
                                     Expiry Date <span class="text-gray-500">(if applicable)</span>
                                 </label>
-                                <input type="date" name="expiry_date_2" id="expiry_date_2" class="w-full border-gray-300 rounded-md">
+                                <input type="date" name="expiry_date" id="expiry_date" class="w-full border-gray-300 rounded-md">
                             </div>
                             <div class="space-y-2">
-                                <label for="credential_number_2" class="text-sm font-medium text-gray-700">
+                                <label for="credential_number" class="text-sm font-medium text-gray-700">
                                     Credential Number <span class="text-gray-500">(if applicable)</span>
                                 </label>
-                                <input type="text" name="credential_number_2" id="credential_number_2" class="w-full border-gray-300 rounded-md" placeholder="License/Certificate number">
+                                <input type="text" name="credential_number" id="credential_number" class="w-full border-gray-300 rounded-md" placeholder="License/Certificate number">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Credential 3 -->
-                <div class="record-item border rounded-lg p-6 bg-gray-50 mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                        <i data-lucide="award" class="h-4 w-4 mr-2"></i>
-                        Credential 3
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="space-y-2">
-                            <label for="credential_name_3" class="text-sm font-medium text-gray-700">
-                                Credential/License Name <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="credential_name_3" id="credential_name_3" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Professional (PMP), CPA License">
-                        </div>
-                        <div class="space-y-2">
-                            <label for="issuing_organization_3" class="text-sm font-medium text-gray-700">
-                                Issuing Organization <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="issuing_organization_3" id="issuing_organization_3" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Institute, State Board of Accountancy">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="space-y-2">
-                                <label for="issue_date_3" class="text-sm font-medium text-gray-700">
-                                    Issue Date <span class="text-red-500">*</span>
-                                </label>
-                                <input type="date" name="issue_date_3" id="issue_date_3" class="w-full border-gray-300 rounded-md">
-                            </div>
-                            <div class="space-y-2">
-                                <label for="expiry_date_3" class="text-sm font-medium text-gray-700">
-                                    Expiry Date <span class="text-gray-500">(if applicable)</span>
-                                </label>
-                                <input type="date" name="expiry_date_3" id="expiry_date_3" class="w-full border-gray-300 rounded-md">
-                            </div>
-                            <div class="space-y-2">
-                                <label for="credential_number_3" class="text-sm font-medium text-gray-700">
-                                    Credential Number <span class="text-gray-500">(if applicable)</span>
-                                </label>
-                                <input type="text" name="credential_number_3" id="credential_number_3" class="w-full border-gray-300 rounded-md" placeholder="License/Certificate number">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 pt-6">
@@ -245,15 +393,38 @@
                 <div class="flex gap-3 sm:ml-auto">
                     <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                         <i data-lucide="save" class="h-4 w-4 mr-2"></i>
-                        Save Draft
+                        Save 
                     </button>
                     <button type="submit" name="action" value="next" class="bg-[#722F37] hover:bg-[#5a252a] text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
-                        Save & Continue
+                        Continue
                         <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
                     </button>
                 </div>
             </div>
         </form>
+
+
+        <div class="credentials_container mt-[20px]">
+            {% for cred in credentials %}
+                <div class="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+                    <div class="space-y-2 mb-4">
+                        <div>
+                            <span class="block text-lg font-semibold text-gray-900">{{ cred.credential_name }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-600">{{ cred.issuing_organization }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">{{ cred.credential_number }}</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" onclick="handleUpdateModal('{{ cred.credential_name }}', '{{ cred.issuing_organization }}', '{{cred.issue_date}}', '{{cred.expiry_date}}', '{{ cred.credential_number }}', '{{cred.id}}')" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200">Edit</a>
+                        <a href="/cred/delete/{{ cred.id }}/" class="text-red-600 hover:text-red-800 font-medium text-sm transition-colors duration-200">Delete</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </main>
 
     <footer class="bg-white border-t mt-12">
@@ -263,5 +434,82 @@
             </div>
         </div>
     </footer>
+
+
+    <div class="background_wrapper"></div>
+    
+
+
+    <div class="update_credentials">
+        <form method="post" action="/cred/update/" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <h4 class="mb-8 text-[23px] ml-5 text-red-700">Upgrade Credentials</h1>
+
+            <span class="text-red-700">Upgrade credential information</span>
+
+            <input type="text" id="updateModelId" hidden name='cred_id'>
+
+           <div class="space-y-2">
+                <label for="credential_name" class="text-sm font-medium text-gray-700">
+                    Credential/License Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="cred_name" id="cred_name" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Professional (PMP), CPA License">
+            </div>
+            <div class="space-y-2">
+                <label for="issuing_organization" class="text-sm font-medium text-gray-700">
+                    Issuing Organization <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="issuing_organization" id="issue_organization" class="w-full border-gray-300 rounded-md" placeholder="e.g., Project Management Institute, State Board of Accountancy">
+            </div>
+            <div class="flex flex-col gap-4 mb-2">
+                <div class="space-y-2">
+                    <label for="issue_date" class="text-sm font-medium text-gray-700">
+                        Issue Date <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" required name="issue_date" id="issue_date" class="w-full border-gray-300 rounded-md">
+                </div>
+                <div class="space-y-2">
+                    <label for="expiry_date" class="text-sm font-medium text-gray-700">
+                        Expiry Date <span class="text-gray-500">(if applicable)</span>
+                    </label>
+                    <input type="date" required name="expiry_date" id="expiry_date" class="w-full border-gray-300 rounded-md">
+                </div>
+                <div class="space-y-2">
+                    <label for="cred_number" class="text-sm font-medium text-gray-700">
+                        Credential Number <span class="text-gray-500">(if applicable)</span>
+                    </label>
+                    <input type="text" name="cred_number" id="cred_number" class="w-full border-gray-300 rounded-md" placeholder="License/Certificate number">
+                </div>
+            </div>
+  
+          
+          <button>submit</button>
+        </form>
+        <button
+          id="cancelNewStock"
+          class="cancel_btn"
+          onclick="closeUpdateModal()"
+        >
+          cancel
+        </button>
+    </div>
+  
+
+
+
+    <div class="deletePopOut">
+        <p>Are you sure you want to delete <span class="popOutItemName"></span>?</p>
+        <div class="btn_wrapper">
+          <button class="danger">
+            <a class="popOutItemLink" href="#">Yes</a>
+          </button>
+          <button id="cancelPopOut" class="cancel_btnPopOut" onclick="closePopOut()">
+            No
+        </button>
+        </div>
+      </div>
+
+
 </body>
 </html>
