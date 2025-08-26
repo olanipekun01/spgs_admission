@@ -819,90 +819,50 @@ def ApplySix(request):
 
         # Handle GET request to display existing data
         # references = Reference.objects.filter(applicant=applicant, session=current_session).order_by('id')
-        references = list(Reference.objects.filter(applicant=applicant, session=current_session).order_by('id'))
-        if len(references) < 3:
-            # Pad with unsaved Reference objects to ensure 3 forms
-            additional_refs = [Reference(applicant=applicant, session=current_session) for _ in range(3 - len(references))]
-            references.extend(additional_refs)
+        references = Reference.objects.filter(applicant=applicant, session=current_session)
+        # if len(references) < 3:
+        #     # Pad with unsaved Reference objects to ensure 3 forms
+        #     additional_refs = [Reference(applicant=applicant, session=current_session) for _ in range(3 - len(references))]
+        #     references.extend(additional_refs)
         context = {
             'references': references,
             'current_year': timezone.now().year,
         }
         if request.method == 'GET':
-            # context = {
-            #     'references': references,
-            #     'current_year': timezone.now().year,
-            # }
             return render(request, './application/applysix.html', context)
 
         # Handle POST request to save or update data
         if request.method == 'POST':
             action = request.POST.get('action')
             # Delete existing references if starting fresh (optional logic based on your needs)
-            if 'clear_references' in request.POST:
-                Reference.objects.filter(applicant=applicant, session=current_session).delete()
-                references = []
 
             # Process submitted references
-            reference_data = []
-            for i in range(1, 4):  # Assuming up to 3 references
-                name = request.POST.get(f'references[{i}][name]', '')
-                position_rank = request.POST.get(f'references[{i}][position_rank]', '')
-                address = request.POST.get(f'references[{i}][address]', '')
-                phone_number = request.POST.get(f'references[{i}][phone_number]', '')
-                email = request.POST.get(f'references[{i}][email]', '')
-                relationship_type = request.POST.get(f'references[{i}][relationship_type]', '')
-                institution_organization = request.POST.get(f'references[{i}][institution_organization]', '')
-                years_known = request.POST.get(f'references[{i}][years_known]', '')
+            
+            name = request.POST.get(f'references[name]', '')
+            position_rank = request.POST.get(f'references[position_rank]', '')
+            address = request.POST.get(f'references[address]', '')
+            phone_number = request.POST.get(f'references[phone_number]', '')
+            email = request.POST.get(f'references[email]', '')
+            relationship_type = request.POST.get(f'references[relationship_type]', '')
+            institution_organization = request.POST.get(f'references[institution_organization]', '')
+            years_known = request.POST.get(f'references[years_known]', '')
 
-                if name or position_rank or address or phone_number or email:  # Only process if at least one field is filled
-                    reference_data.append({
-                        'name': name,
-                        'position_rank': position_rank,
-                        'address': address,
-                        'phone_number': phone_number,
-                        'email': email,
-                        'relationship': relationship_type,
-                        'institution_organization': institution_organization,
-                        'years_known': years_known,
-                    })
-
-            # Validate at least one undergraduate teacher
-            # has_undergraduate_teacher = any(ref['is_undergraduate_teacher'] or ref['relationship_type'] == 'undergraduate_professor_lecturer' for ref in reference_data)
-            # if not has_undergraduate_teacher:
-            #     messages.error(request, "At least one reference must be an undergraduate teacher/professor.")
-            #     context['references'] = references
-            #     return render(request, './application/applysix.html', context)
-
-            # Save or update references
-            existing_ids = set(Reference.objects.filter(applicant=applicant, session=current_session).values_list('id', flat=True))
-            for i, data in enumerate(reference_data):
-                reference_id = data.get('id') if 'id' in data else None
-                if reference_id and str(reference_id) in existing_ids:
-                    reference = Reference.objects.get(id=reference_id, applicant=applicant, session=current_session)
-                else:
-                    reference = Reference(applicant=applicant, session=current_session)
-
-                reference.name = data['name']
-                reference.position_rank = data['position_rank']
-                reference.address = data['address']
-                reference.phone_number = data['phone_number']
-                reference.email = data['email']
-                # reference.is_undergraduate_teacher = data['is_undergraduate_teacher']
-                reference.relationship = data['relationship_type']
-                reference.institution_organization = data['institution_organization']
-                reference.years_known = int(data['years_known']) if data['years_known'].isdigit() else 0
-
+            if Reference.objects.filter(applicant=applicant, session=current_session, email=email).exists():
+                messages.success(request, "References already exists!")
+                return redirect('/apply/6/')
+            else:
                 try:
-                    reference.full_clean()
+                    reference = Reference.objects.create(applicant=applicant, session=current_session, name=name,
+                                                     position_rank=position_rank, address=address,
+                                                     phone_number=phone_number, email=email, relationship=relationship_type,
+                                                     institution_organization=institution_organization, years_known=years_known)
+
                     reference.save()
                 except ValidationError as e:
-                    for field, errors in e.message_dict.items():
-                        for error in errors:
-                            messages.error(request, f"{field.replace('_', ' ').capitalize()} for reference {i + 1}: {error}")
+                    messages.error(request, f"Invalid Request!")
 
             if action == 'save' and not messages.get_messages(request):
-                messages.success(request, "References saved as draft.")
+                messages.success(request, "References saved!")
                 return redirect('/apply/6/')
             elif action == 'next' and not messages.get_messages(request):
                 messages.success(request, "References saved. Proceeding to next step.")
@@ -910,6 +870,47 @@ def ApplySix(request):
 
         context['references'] = references
         return render(request, './application/applysix.html', context)
+
+def RefDelete(request, id):
+    if request.user.is_authenticated:
+        user = request.user
+        cred = get_object_or_404(Reference, id=id)
+        cred.delete()
+        
+        messages.success(request, "Credentials deleted!")
+        return redirect('/apply/6/')
+
+
+def RefUpdate(request):
+    if request.user.is_authenticated:
+        user = request.user
+
+        if request.method == 'POST':
+            ref_name = request.POST.get("ref_name", "")
+            issuing_organization = request.POST.get("issuing_organization", "")
+            issue_date = request.POST.get("issue_date", "")
+            expiry_date = request.POST.get("expiry_date", "")
+            ref_number = request.POST.get("ref_number", "")
+            ref_id = request.POST.get("ref_id", "")
+            print(cred_id)
+            try:
+                credential = get_object_or_404(ProfessionalCredential, id=cred_id)
+
+                credential.credential_name = cred_name
+                credential.issuing_organization = issuing_organization
+                credential.issue_date = issue_date
+                credential.expiry_date = expiry_date
+                credential.credential_number = cred_number
+
+                credential.save()
+                messages.success(request, "Credentials Updated!")
+                return redirect('/apply/4/')
+            except ValueError as e:
+                messages.error(request, f"Invalid Credential!: {str(e)}")
+                return redirect('/apply/4/')
+            except ValidationError as e:
+                messages.error(request, f"Invalid Credential!: {str(e)}")
+                return redirect('/apply/4/')
 
 from .models import Application, AdditionalInformation, Honor, Session
 from django import forms

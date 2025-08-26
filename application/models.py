@@ -317,6 +317,7 @@ class NextOfKin(models.Model):
             raise ValidationError("Please enter a valid alternate phone number.")
 
 class Reference(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     applicant = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='references')
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=200, blank=False)

@@ -6,6 +6,197 @@
     <title>Academic & Professional References</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        .update_credentials {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #C3C4CE;
+            padding: 20px 20px;
+            width: 550px;
+            height: 700px;
+            border-radius: 20px;
+            display: none;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+        }
+
+        .create_programme form input, .update_credentials form input {
+            /* width: 220px; */
+            width: 100%;
+            height: 50px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            padding-left: 25px;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+        .create_programme form select, .update_credentials form select {
+            width: 250px;
+            height: 30px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            padding-left: 20px;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* .create_programme form .checkbox_wrapper {} */
+
+        .create_programme form .checkbox_card, .update_credentials form .checkbox_card {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .create_programme form label, .update_credentials form label {
+            color: #545F7D;
+            /* padding: 12px 15px; */
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .create_programme form label.depts_checkbox,
+        .update_credentials form label.depts_checkbox {
+            font-size: 23px;
+            /* margin-bottom: 20px; */
+        }
+
+        .create_programme form input.checkbx,
+        .update_credentials form input.checkbx {
+            width: 15px;
+            height: 15px;
+            border-radius: 25px;
+            border: none;
+            margin: 0 0;
+        }
+
+        .create_programme form .checkbx_label, 
+        .update_credentials form .checkbx_label {
+            margin-left: 10px;
+        }
+
+        .create_programme form button,
+        .update_credentials form button {
+            font-size: 18px;
+            padding: 6px 0px;
+            width: 100%;
+            border-radius: 25px;
+            border: none;
+            margin-bottom: 20px;
+            color: white;
+            background: rgb(4, 134, 70);
+
+        }
+
+        .create_programme form button:hover,
+        .update_credentials form button:hover {
+            color: rgb(4, 134, 70);
+            background: white;
+        }
+
+        .create_programme .cancel_btn,
+        .update_credentials .cancel_btn {
+            font-size: 18px;
+            padding: 6px 0px;
+            width: 100%;
+            border-radius: 25px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .create_programme .cancel_btn:hover,
+        .update_credentials .cancel_btn:hover {
+            font-weight: 700;
+            color: red;
+        }
+
+        .deletePopOut {
+            background-color: #C3C4CE;
+            padding: 20px 20px;
+            min-width: 350px;
+            width: auto;
+            height: auto; /* Adapt to content */
+            border-radius: 20px;
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow-y: auto;
+            z-index: 1001;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .deletePopOut p {
+            color: #1E2875;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .deletePopOut .btn_wrapper {
+            display: flex;
+            width: 160px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .deletePopOut .btn_wrapper button {
+            background: #1E2875;
+            color: white;
+            width: 70px;
+            font-size: 17px;
+            font-weight: 500;
+            padding: 10px 0;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .deletePopOut .btn_wrapper button.danger {
+            background: red;
+        }
+
+        .deletePopOut .btn_wrapper button.danger a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .deletePopOut .btn_wrapper button.danger:hover {
+            letter-spacing: 1.5px;
+            background: white;
+            color: red;
+        }
+
+        .deletePopOut .btn_wrapper button.danger:hover a {
+            color: red;
+        }
+
+        .deletePopOut .btn_wrapper button.cancel_btnPopOut:hover {
+            letter-spacing: 1.5px;
+            background: white;
+            color: #1E2875;
+        }
+
+        .background_wrapper {
+            position: fixed; /* Fix to viewport */
+            left: 0;
+            top: 0;
+            width: 100vw; /* Full viewport width */
+            height: 100vh; /* Full viewport height */
+            background: rgba(4, 134, 70, 0.5); /* Semi-transparent green */
+            backdrop-filter: blur(5px); /* Blur effect */
+            display: none; /* Hidden by default */
+            z-index: 1000; /* Ensure it’s above other content */
+        }
+    </style>
+
 </head>
 <body class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Header -->
@@ -54,6 +245,9 @@
 
     <!-- Main Content -->
     <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% for message in messages %}
+            <h5 style="color: red">{{message}}</h5>
+        {% endfor %}
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">Academic & Professional References</h1>
             <p class="text-gray-600">
@@ -79,162 +273,381 @@
         <form method="post" action="/apply/6/" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="bg-white shadow-lg border-0 rounded-lg mb-8">
-               <div class="p-6 space-y-8">
-    {% if references %}
-        {% for ref in references|slice:":3" %}
-            {% with forloop.counter0 as index %}
-                <div class="border rounded-lg p-6 bg-gray-50">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                            <i data-lucide="user" class="h-4 w-4 mr-2"></i>
-                            Reference {{ forloop.counter }}
-                        </h3>
-                    </div>
-
-                    <div class="space-y-6">
-                        <!-- Basic Information -->
-                        <div class="space-y-4">
-                            <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Basic Information</h4>
-                            <div class="space-y-2">
-                                <label for="name-{{ index }}" class="text-sm font-medium text-gray-700">
-                                    Full Name <span class="text-red-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
-                                    <input type="text" id="name-{{ index }}" name="references[{{ index }}][name]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.name|default:'' }}" placeholder="Enter full name (e.g., Dr. John Smith)">
-                                </div>
-                                {% if messages %}
-                                    {% for message in messages %}
-                                        {% if 'name' in message.message.lower and index|stringformat:"s" in message.message.lower %}
-                                            <p class="text-sm text-red-600">{{ message }}</p>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <label for="position_rank-{{ index }}" class="text-sm font-medium text-gray-700">
-                                        Position/Rank <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" id="position_rank-{{ index }}" name="references[{{ index }}][position_rank]" value="{{ ref.position_rank|default:'' }}" class="w-full border-gray-300 rounded-md">
-                                    {% if messages %}
-                                        {% for message in messages %}
-                                            {% if 'position' in message.message.lower and index|stringformat:"s" in message.message.lower %}
-                                                <p class="text-sm text-red-600">{{ message }}</p>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                                <div class="space-y-2">
-                                    <label for="relationship_type-{{ index }}" class="text-sm font-medium text-gray-700">
-                                        Relationship Type <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" id="relationship_type-{{ index }}" name="references[{{ index }}][relationship_type]" value="{{ ref.relationship_type|default:'' }}" class="w-full border-gray-300 rounded-md">
-                                    {% if messages %}
-                                        {% for message in messages %}
-                                            {% if 'relationship' in message.message.lower and index|stringformat:"s" in message.message.lower %}
-                                                <p class="text-sm text-red-600">{{ message }}</p>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
+                <div class="p-6 space-y-8">
+                    <div class="border rounded-lg p-6 bg-gray-50">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i data-lucide="user" class="h-4 w-4 mr-2"></i>
+                                Reference 
+                            </h3>
                         </div>
 
-                        <!-- Professional Details -->
-                        <div class="space-y-4">
-                            <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Professional Details</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-6">
+                            <!-- Basic Information -->
+                            <div class="space-y-4">
+                                <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Basic Information</h4>
                                 <div class="space-y-2">
-                                    <label for="institution_organization-{{ index }}" class="text-sm font-medium text-gray-700">
-                                        Institution/Organization <span class="text-red-500">*</span>
+                                    <label for="name" class="text-sm font-medium text-gray-700">
+                                        Full Name <span class="text-red-500">*</span>
                                     </label>
                                     <div class="relative">
-                                        <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
-                                        <input type="text" id="institution_organization-{{ index }}" name="references[{{ index }}][institution_organization]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.institution_organization|default:'' }}" placeholder="Enter institution or organization name">
+                                        <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                        <input type="text" id="name" name="references[name]" class="w-full pl-10 border-gray-300 rounded-md" value="" placeholder="Enter full name (e.g., Dr. John Smith)">
                                     </div>
                                     {% if messages %}
                                         {% for message in messages %}
-                                            {% if 'institution' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                            {% if 'name' in message.message.lower and index|stringformat:"s" in message.message.lower %}
                                                 <p class="text-sm text-red-600">{{ message }}</p>
                                             {% endif %}
                                         {% endfor %}
                                     {% endif %}
                                 </div>
-                                <div class="space-y-2">
-                                    <label for="years_known-{{ index }}" class="text-sm font-medium text-gray-700">
-                                        Years Known <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="number" id="years_known-{{ index }}" name="references[{{ index }}][years_known]" class="w-full border-gray-300 rounded-md" value="{{ ref.years_known|default:'' }}" min="1" max="50" placeholder="Number of years">
-                                    {% if messages %}
-                                        {% for message in messages %}
-                                            {% if 'years' in message.message.lower and index|stringformat:"s" in message.message.lower %}
-                                                <p class="text-sm text-red-600">{{ message }}</p>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Contact Information -->
-                        <div class="space-y-4">
-                            <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Contact Information</h4>
-                            <div class="space-y-2">
-                                <label for="address-{{ index }}" class="text-sm font-medium text-gray-700">
-                                    Complete Address <span class="text-red-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <i data-lucide="map-pin" class="absolute left-3 top-3 text-gray-400 h-4 w-4"></i>
-                                    <textarea id="address-{{ index }}" name="references[{{ index }}][address]" class="w-full pl-10 border-gray-300 rounded-md" rows="3" placeholder="Enter complete address including institution/organization address">{{ ref.address|default:'' }}</textarea>
-                                </div>
-                                {% if messages %}
-                                    {% for message in messages %}
-                                        {% if 'address' in message.message.lower and index|stringformat:"s" in message.message.lower %}
-                                            <p class="text-sm text-red-600">{{ message }}</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="position_rank" class="text-sm font-medium text-gray-700">
+                                            Position/Rank <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="position_rank" name="references[position_rank]" value="" class="w-full border-gray-300 rounded-md">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'position' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
                                         {% endif %}
-                                    {% endfor %}
-                                {% endif %}
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="relationship_type" class="text-sm font-medium text-gray-700">
+                                            Relationship Type <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="relationship_type" name="references[relationship_type]" value="" class="w-full border-gray-300 rounded-md">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'relationship' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <!-- Professional Details -->
+                            <div class="space-y-4">
+                                <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Professional Details</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="institution_organization-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Institution/Organization <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                            <input type="text" id="institution_organization" name="references[institution_organization]" class="w-full pl-10 border-gray-300 rounded-md" value="" placeholder="Enter institution or organization name">
+                                        </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'institution' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="years_known" class="text-sm font-medium text-gray-700">
+                                            Years Known <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="number" id="years_known" name="references[years_known]" class="w-full border-gray-300 rounded-md" value="" min="1" max="50" placeholder="Number of years">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'years' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Information -->
+                            <div class="space-y-4">
+                                <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Contact Information</h4>
                                 <div class="space-y-2">
-                                    <label for="phone_number-{{ index }}" class="text-sm font-medium text-gray-700">
-                                        Phone Number <span class="text-red-500">*</span>
+                                    <label for="address" class="text-sm font-medium text-gray-700">
+                                        Complete Address <span class="text-red-500">*</span>
                                     </label>
                                     <div class="relative">
-                                        <i data-lucide="phone" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
-                                        <input type="text" id="phone_number-{{ index }}" name="references[{{ index }}][phone_number]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.phone_number|default:'' }}" placeholder="Enter phone number">
+                                        <i data-lucide="map-pin" class="absolute left-3 top-3 text-gray-400 h-4 w-4"></i>
+                                        <textarea id="address" name="references[address]" class="w-full pl-10 border-gray-300 rounded-md" rows="3" placeholder="Enter complete address including institution/organization address"></textarea>
                                     </div>
                                     {% if messages %}
                                         {% for message in messages %}
-                                            {% if 'phone' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                            {% if 'address' in message.message.lower and index|stringformat:"s" in message.message.lower %}
                                                 <p class="text-sm text-red-600">{{ message }}</p>
                                             {% endif %}
                                         {% endfor %}
                                     {% endif %}
                                 </div>
-                                <div class="space-y-2">
-                                    <label for="email-{{ index }}" class="text-sm font-medium text-gray-700">
-                                        Email Address <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="relative">
-                                        <i data-lucide="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
-                                        <input type="email" id="email-{{ index }}" name="references[{{ index }}][email]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.email|default:'' }}" placeholder="Enter email address">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="phone_number" class="text-sm font-medium text-gray-700">
+                                            Phone Number <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="phone" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                            <input type="text" id="phone_number" name="references[phone_number]" class="w-full pl-10 border-gray-300 rounded-md" value="" placeholder="Enter phone number">
+                                        </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'phone' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
-                                    {% if messages %}
-                                        {% for message in messages %}
-                                            {% if 'email' in message.message.lower and index|stringformat:"s" in message.message.lower %}
-                                                <p class="text-sm text-red-600">{{ message }}</p>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
+                                    <div class="space-y-2">
+                                        <label for="email-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Email Address <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                            <input type="email" id="email" name="references[email]" class="w-full pl-10 border-gray-300 rounded-md" value="" placeholder="Enter email address">
+                                        </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'email' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endwith %}
-        {% empty %}
+            </div>
+
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+                <div class="flex items-start">
+                    <i data-lucide="alert-circle" class="h-5 w-5 text-red-500 mr-3 mt-0.5"></i>
+                    <div>
+                        <h4 class="font-medium text-red-800 mb-1">Important Notice</h4>
+                        <p class="text-sm text-red-700">
+                            Please ensure that all references listed above are aware that they may be contacted by the University 
+                            regarding your application. Provide accurate and up-to-date contact information to avoid delays in 
+                            the application review process.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                <button type="button" onclick="window.history.back()" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                    Previous Step
+                </button>
+                <div class="flex gap-3 sm:ml-auto">
+                    <!-- <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                        Save Draft
+                    </button> -->
+                     <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                        Save 
+                    </button>
+                    <button type="submit" name="action" value="next" class="bg-[#722F37] hover:bg-[#5a252a] text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
+                        Continue
+                        <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="credentials_container mt-[20px]">
+            {% for ref in references %}
+                <div class="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+                    <div class="space-y-2 mb-4">
+                        <div>
+                            <span class="block text-lg font-semibold text-gray-900">{{ ref.name }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-600">{{ ref.position_rank }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">{{ ref.email }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">www.localhost:8000/fill/reference/{{ ref.id }}</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" onclick="handleUpdateModal('{{ ref.name }}', '{{ ref.position_rank }}', '{{ref.address}}', '{{ref.phone_number}}', '{{ ref.email }}', '{{ref.relationship}}', '{{ref.institution_organization}}', '{{ref.years_known}}', '{{ref.id}}')" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200">Edit</a>
+                        <a href="/ref/delete/{{ ref.id }}/" class="text-red-600 hover:text-red-800 font-medium text-sm transition-colors duration-200">Delete</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% comment %} <form method="post" action="/apply/6/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="bg-white shadow-lg border-0 rounded-lg mb-8">
+               <div class="p-6 space-y-8">
+             {% if references %}
+            {% for ref in references|slice:":3" %}
+                {% with forloop.counter0 as index %}
+                    <div class="border rounded-lg p-6 bg-gray-50">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i data-lucide="user" class="h-4 w-4 mr-2"></i>
+                                Reference {{ forloop.counter }}
+                            </h3>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Basic Information -->
+                            <div class="space-y-4">
+                                <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Basic Information</h4>
+                                <div class="space-y-2">
+                                    <label for="name-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Full Name <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                        <input type="text" id="name-{{ index }}" name="references[{{ index }}][name]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.name|default:'' }}" placeholder="Enter full name (e.g., Dr. John Smith)">
+                                    </div>
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'name' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="position_rank-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Position/Rank <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="position_rank-{{ index }}" name="references[{{ index }}][position_rank]" value="{{ ref.position_rank|default:'' }}" class="w-full border-gray-300 rounded-md">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'position' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="relationship_type-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Relationship Type <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="relationship_type-{{ index }}" name="references[{{ index }}][relationship_type]" value="{{ ref.relationship_type|default:'' }}" class="w-full border-gray-300 rounded-md">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'relationship' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Professional Details -->
+                            <div class="space-y-4">
+                                <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Professional Details</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="institution_organization-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Institution/Organization <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                            <input type="text" id="institution_organization-{{ index }}" name="references[{{ index }}][institution_organization]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.institution_organization|default:'' }}" placeholder="Enter institution or organization name">
+                                        </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'institution' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="years_known-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Years Known <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="number" id="years_known-{{ index }}" name="references[{{ index }}][years_known]" class="w-full border-gray-300 rounded-md" value="{{ ref.years_known|default:'' }}" min="1" max="50" placeholder="Number of years">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'years' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Information -->
+                            <div class="space-y-4">
+                                <h4 class="text-md font-semibold text-gray-800 border-b pb-2">Contact Information</h4>
+                                <div class="space-y-2">
+                                    <label for="address-{{ index }}" class="text-sm font-medium text-gray-700">
+                                        Complete Address <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="map-pin" class="absolute left-3 top-3 text-gray-400 h-4 w-4"></i>
+                                        <textarea id="address-{{ index }}" name="references[{{ index }}][address]" class="w-full pl-10 border-gray-300 rounded-md" rows="3" placeholder="Enter complete address including institution/organization address">{{ ref.address|default:'' }}</textarea>
+                                    </div>
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            {% if 'address' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                <p class="text-sm text-red-600">{{ message }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label for="phone_number-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Phone Number <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="phone" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                            <input type="text" id="phone_number-{{ index }}" name="references[{{ index }}][phone_number]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.phone_number|default:'' }}" placeholder="Enter phone number">
+                                        </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'phone' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="email-{{ index }}" class="text-sm font-medium text-gray-700">
+                                            Email Address <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"></i>
+                                            <input type="email" id="email-{{ index }}" name="references[{{ index }}][email]" class="w-full pl-10 border-gray-300 rounded-md" value="{{ ref.email|default:'' }}" placeholder="Enter email address">
+                                        </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if 'email' in message.message.lower and index|stringformat:"s" in message.message.lower %}
+                                                    <p class="text-sm text-red-600">{{ message }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endwith %}
+            {% empty %}
             {% for i in "123"|make_list %}
                 {% with forloop.counter0 as index %}
                     <div class="border rounded-lg p-6 bg-gray-50">
@@ -426,7 +839,7 @@
                     </button>
                 </div>
             </div>
-        </form>
+        </form> {% endcomment %}
     </main>
 
     <!-- Footer -->
@@ -437,10 +850,157 @@
             </div>
         </div>
     </footer>
+
+     <div class="background_wrapper"></div>
+    
+
+
+    <div class="update_credentials overflow-y-scroll">
+        <form class="" method="post" action="/ref/update/" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <h4 class="mb-8 text-[23px] ml-5 text-red-700">Upgrade Referee</h1>
+
+            <span class="text-red-700">Upgrade Referee information</span>
+
+            <input type="text" id="updateModelId" hidden name='ref_id'>
+
+           <div class="space-y-2">
+                <label for="ref_name" class="text-sm font-medium text-gray-700">
+                    Full Name  <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="ref_name" id="ref_name" class="w-full border-gray-300 rounded-md" placeholder="e.g., Referee Name">
+            </div>
+            <div class="space-y-2">
+                <label for="position" class="text-sm font-medium text-gray-700">
+                    Position/Rank <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="position" id="position" class="w-full border-gray-300 rounded-md" placeholder="e.g., Position/Rank">
+            </div>
+            <div class="flex flex-col gap-4 mb-2">
+                <div class="space-y-2">
+                    <label for="relationship" class="text-sm font-medium text-gray-700">
+                         Relationship Type <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="relationship" id="relationship" class="w-full border-gray-300 rounded-md" placeholder="e.g., Relationship">
+                </div>
+                <div class="space-y-2">
+                    <label for="institution" class="text-sm font-medium text-gray-700">
+                        Institution/Organization <span class="text-gray-500">*</span>
+                    </label>
+                    <input type="text" name="institution" id="institution" class="w-full border-gray-300 rounded-md" placeholder="e.g., Institution">
+                </div>
+                <div class="space-y-2">
+                    <label for="years_known" class="text-sm font-medium text-gray-700">
+                        Years Known <span class="text-gray-500">*</span>
+                    </label>
+                    <input type="text" name="years_known" id="years_known" class="w-full border-gray-300 rounded-md" placeholder="Years Known">
+                </div>
+                <div class="space-y-2">
+                    <label for="complete_address" class="text-sm font-medium text-gray-700">
+                        Complete Address <span class="text-gray-500">*</span>
+                    </label>
+                    <input type="text" name="complete_address" id="complete_address" class="w-full border-gray-300 rounded-md" placeholder="Complete Address">
+                </div>
+                <div class="space-y-2">
+                    <label for="phone_number" class="text-sm font-medium text-gray-700">
+                        Phone Number <span class="text-gray-500">*</span>
+                    </label>
+                    <input type="text" name="phone_number" id="phone_number" class="w-full border-gray-300 rounded-md" placeholder="Phone Number">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="email_address" class="text-sm font-medium text-gray-700">
+                        Email Address <span class="text-gray-500">*</span>
+                    </label>
+                    <input type="text" name="email_address" id="email_address" class="w-full border-gray-300 rounded-md" placeholder="Email Address">
+                </div>
+            </div>
+  
+          
+          <button>submit</button>
+        </form>
+        <button
+          id="cancelNewStock"
+          class="cancel_btn"
+          onclick="closeUpdateModal()"
+        >
+          cancel
+        </button>
+    </div>
+  
+
+
+
+    <div class="deletePopOut">
+        <p>Are you sure you want to delete <span class="popOutItemName"></span>?</p>
+        <div class="btn_wrapper">
+          <button class="danger">
+            <a class="popOutItemLink" href="#">Yes</a>
+          </button>
+          <button id="cancelPopOut" class="cancel_btnPopOut" onclick="closePopOut()">
+            No
+          </button>
+        </div>
+    </div>
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
+
+            const noCredentialsCheckbox = document.getElementById('no-credentials');
+            const noCredentialsMessage = document.getElementById('no-credentials-message');
+            const credentialsContainer = document.getElementById('credentials-container');
+
+            // Handle "No Credentials" checkbox change
+            function handleNoCredentialsChange(checked) {
+                noCredentialsMessage.style.display = checked ? 'block' : 'none';
+                credentialsContainer.style.display = checked ? 'none' : 'block';
+            }
+
+            noCredentialsCheckbox.addEventListener('change', function() {
+                handleNoCredentialsChange(this.checked);
+            });
+            handleNoCredentialsChange(noCredentialsCheckbox.checked);
         });
+
+        function convertDateFormat(dateStr) {
+            // Parse the input date string
+            const months = {
+                'Jan.': '01', 'Feb.': '02', 'Mar.': '03', 'Apr.': '04',
+                'May.': '05', 'Jun.': '06', 'Jul.': '07', 'Aug.': '08',
+                'Sep.': '09', 'Oct.': '10', 'Nov.': '11', 'Dec.': '12'
+            };
+
+            const [monthAbbr, day, year] = dateStr.split('. ');
+            const month = months[monthAbbr + '.'];
+            const formattedDay = day.padStart(2, '0'); // Ensure two digits (e.g., "01" instead of "1")
+            const formattedDate = `${year}-${month}-${formattedDay}`;
+
+            return formattedDate;
+        }
+ 
+        function handleUpdateModal(name, position_rank, address, phone_number, email, relationship, institution_organization, years_known, id) {
+            document.querySelector(".update_credentials").style.display = "block";
+            document.querySelector(".background_wrapper").style.display = "block";
+            document.querySelector('#ref_name').value = name;
+            document.querySelector('#position').value = position_rank;
+            document.querySelector('#relationship').value = relatioship;  
+            document.querySelector('#institution').value = institution_organization;  
+            document.querySelector('#years_known').value = years_known; 
+            document.querySelector('#complete_address').value = complete_address; 
+            document.querySelector('#phone_number').value = phone_number; 
+            document.querySelector('#email_address').value = email_address; 
+            document.querySelector('#updateModelId').value = id;
+            
+        }
+
+        function closeUpdateModal() {
+            event.preventDefault();
+            document.querySelector(".update_credentials").style.display = "none";
+            document.querySelector(".background_wrapper").style.display = "none";
+        }
     </script>
 </body>
 </html>
