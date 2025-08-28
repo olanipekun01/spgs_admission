@@ -40,8 +40,12 @@ urlpatterns = [
     path('ref/update/', views.RefUpdate, name="ref_update"),
 
     path('apply/7/', views.ApplySeven, name="applyseven"),
+
+
     path('apply/8/', views.ApplyEight, name='apply_eight'),
     path('delete-file/<int:file_id>/', views.delete_file, name='delete_file'),
+
+    
     path('apply/review/', views.application_review, name='application_review'),
 ]
 
