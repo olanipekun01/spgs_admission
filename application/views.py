@@ -835,38 +835,39 @@ def ApplySix(request):
         if request.method == 'POST':
             action = request.POST.get('action')
             # Delete existing references if starting fresh (optional logic based on your needs)
-
-            # Process submitted references
-            
-            name = request.POST.get(f'references[name]', '')
-            position_rank = request.POST.get(f'references[position_rank]', '')
-            address = request.POST.get(f'references[address]', '')
-            phone_number = request.POST.get(f'references[phone_number]', '')
-            email = request.POST.get(f'references[email]', '')
-            relationship_type = request.POST.get(f'references[relationship_type]', '')
-            institution_organization = request.POST.get(f'references[institution_organization]', '')
-            years_known = request.POST.get(f'references[years_known]', '')
-
-            if Reference.objects.filter(applicant=applicant, session=current_session, email=email).exists():
-                messages.success(request, "References already exists!")
-                return redirect('/apply/6/')
-            else:
-                try:
-                    reference = Reference.objects.create(applicant=applicant, session=current_session, name=name,
-                                                     position_rank=position_rank, address=address,
-                                                     phone_number=phone_number, email=email, relationship=relationship_type,
-                                                     institution_organization=institution_organization, years_known=years_known)
-
-                    reference.save()
-                except ValidationError as e:
-                    messages.error(request, f"Invalid Request!")
-
             if action == 'save' and not messages.get_messages(request):
                 messages.success(request, "References saved!")
                 return redirect('/apply/6/')
+            
+                # Process submitted references
+                
+                name = request.POST.get(f'references[name]', '')
+                position_rank = request.POST.get(f'references[position_rank]', '')
+                address = request.POST.get(f'references[address]', '')
+                phone_number = request.POST.get(f'references[phone_number]', '')
+                email = request.POST.get(f'references[email]', '')
+                relationship_type = request.POST.get(f'references[relationship_type]', '')
+                institution_organization = request.POST.get(f'references[institution_organization]', '')
+                years_known = request.POST.get(f'references[years_known]', '')
+
+                if Reference.objects.filter(applicant=applicant, session=current_session, email=email).exists():
+                    messages.success(request, "References already exists!")
+                    return redirect('/apply/6/')
+                else:
+                    try:
+                        reference = Reference.objects.create(applicant=applicant, session=current_session, name=name,
+                                                        position_rank=position_rank, address=address,
+                                                        phone_number=phone_number, email=email, relationship=relationship_type,
+                                                        institution_organization=institution_organization, years_known=years_known)
+
+                        reference.save()
+                    except ValidationError as e:
+                        messages.error(request, f"Invalid Request!")
+
             elif action == 'next' and not messages.get_messages(request):
                 messages.success(request, "References saved. Proceeding to next step.")
                 return redirect('/apply/7/')  # Adjust to your next URL
+            # Adjust to your next URL
 
         context['references'] = references
         return render(request, './application/applysix.html', context)
@@ -887,30 +888,36 @@ def RefUpdate(request):
 
         if request.method == 'POST':
             ref_name = request.POST.get("ref_name", "")
-            issuing_organization = request.POST.get("issuing_organization", "")
-            issue_date = request.POST.get("issue_date", "")
-            expiry_date = request.POST.get("expiry_date", "")
-            ref_number = request.POST.get("ref_number", "")
+            position = request.POST.get("position", "")
+            relationship = request.POST.get("relationship", "")
+            institution = request.POST.get("institution", "")
+            years_known = request.POST.get("years_known", "")
+            complete_address = request.POST.get("complete_address", "")
+            phone_number = request.POST.get("phone_number", "")
+            email_address = request.POST.get("email_address", "")
             ref_id = request.POST.get("ref_id", "")
-            print(cred_id)
+            
             try:
-                credential = get_object_or_404(ProfessionalCredential, id=cred_id)
+                reference = get_object_or_404(Reference, id=ref_id)
 
-                credential.credential_name = cred_name
-                credential.issuing_organization = issuing_organization
-                credential.issue_date = issue_date
-                credential.expiry_date = expiry_date
-                credential.credential_number = cred_number
+                reference.name = ref_name
+                reference.position_rank = position
+                reference.address = complete_address
+                reference.phone_number = phone_number
+                reference.institution_organization = institution
+                reference.email = email_address
+                reference.relationship = relationship
+                reference.years_known = years_known
 
-                credential.save()
-                messages.success(request, "Credentials Updated!")
-                return redirect('/apply/4/')
+                reference.save()
+                messages.success(request, "Referee Updated!")
+                return redirect('/apply/6/')
             except ValueError as e:
-                messages.error(request, f"Invalid Credential!: {str(e)}")
-                return redirect('/apply/4/')
+                messages.error(request, f"Invalid Information of Referee!: {str(e)}")
+                return redirect('/apply/6/')
             except ValidationError as e:
-                messages.error(request, f"Invalid Credential!: {str(e)}")
-                return redirect('/apply/4/')
+                messages.error(request, f"Invalid Information of Referee!: {str(e)}")
+                return redirect('/apply/6/')
 
 from .models import Application, AdditionalInformation, Honor, Session
 from django import forms
@@ -957,21 +964,21 @@ def ApplySeven(request):
                 additional_info = additional_info_form.save()
 
                 # Process honors
-                for i in range(3):  # Allow up to 3 honors
-                    title = request.POST.get(f'honors[{i}][title]', '').strip()
-                    organization = request.POST.get(f'honors[{i}][organization]', '').strip()
-                    year = request.POST.get(f'honors[{i}][year]', '').strip()
-                    description = request.POST.get(f'honors[{i}][description]', '').strip()
+                # for i in range(3):  # Allow up to 3 honors
+                title = request.POST.get(f'honors[{i}][title]', '').strip()
+                organization = request.POST.get(f'organization', '').strip()
+                year = request.POST.get(f'year', '').strip()
+                description = request.POST.get(f'description', '').strip()
 
-                    if title or organization or year or description:
-                        honor_data = {
-                            'title': title,
-                            'organization': organization,
-                            'year': year,
-                            'description': description,
-                            'additional_info': additional_info,
-                        }
-                        honors_data.append(honor_data)
+                if title or organization or year or description:
+                    honor_data = {
+                        'title': title,
+                        'organization': organization,
+                        'year': year,
+                        'description': description,
+                        'additional_info': additional_info,
+                    }
+                    honors_data.append(honor_data)
 
                 # Delete existing honors and create new ones
                 Honor.objects.filter(additional_info=additional_info).delete()

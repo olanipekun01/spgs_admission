@@ -894,7 +894,7 @@
                     <label for="years_known" class="text-sm font-medium text-gray-700">
                         Years Known <span class="text-gray-500">*</span>
                     </label>
-                    <input type="text" name="years_known" id="years_known" class="w-full border-gray-300 rounded-md" placeholder="Years Known">
+                    <input type="text" name="years_known" id="yearsKnown" class="w-full border-gray-300 rounded-md" placeholder="Years Known">
                 </div>
                 <div class="space-y-2">
                     <label for="complete_address" class="text-sm font-medium text-gray-700">
@@ -906,7 +906,7 @@
                     <label for="phone_number" class="text-sm font-medium text-gray-700">
                         Phone Number <span class="text-gray-500">*</span>
                     </label>
-                    <input type="text" name="phone_number" id="phone_number" class="w-full border-gray-300 rounded-md" placeholder="Phone Number">
+                    <input type="text" name="phone_number" id="phoneNumber" class="w-full border-gray-300 rounded-md" placeholder="Phone Number">
                 </div>
 
                 <div class="space-y-2">
@@ -982,16 +982,18 @@
         }
  
         function handleUpdateModal(name, position_rank, address, phone_number, email, relationship, institution_organization, years_known, id) {
+            console.log(phone_number);
+            console.log(years_known);
             document.querySelector(".update_credentials").style.display = "block";
             document.querySelector(".background_wrapper").style.display = "block";
             document.querySelector('#ref_name').value = name;
             document.querySelector('#position').value = position_rank;
-            document.querySelector('#relationship').value = relatioship;  
+            document.querySelector('#relationship').value = relationship;  
             document.querySelector('#institution').value = institution_organization;  
-            document.querySelector('#years_known').value = years_known; 
-            document.querySelector('#complete_address').value = complete_address; 
-            document.querySelector('#phone_number').value = phone_number; 
-            document.querySelector('#email_address').value = email_address; 
+            document.querySelector('#yearsKnown').value = years_known; 
+            document.querySelector('#complete_address').value = address; 
+            document.querySelector('#phoneNumber').value = phone_number; 
+            document.querySelector('#email_address').value = email; 
             document.querySelector('#updateModelId').value = id;
             
         }

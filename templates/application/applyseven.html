@@ -168,7 +168,7 @@
                     {% endif %}
 
                     <!-- Add Honor Form -->
-                    <div class="border rounded-lg p-4 bg-blue-50 border-blue-200" id="honor-form" style="display: none;">
+                    <div class="border rounded-lg p-4 bg-blue-50 border-blue-200" id="honor-form" style="">
                         <h4 class="font-medium text-gray-900 mb-4 flex items-center gap-2">
                             <i data-lucide="plus" class="h-4 w-4"></i>
                             Add Honor/Award
@@ -245,7 +245,7 @@
                                 >
                             </div>
                         </div>
-                        <div class="flex gap-2 mt-4">
+                        {% comment %} <div class="flex gap-2 mt-4">
                             <button type="button" onclick="addHonor()" class="bg-blue-600 text-white px-4 py-2 rounded-md">
                                 <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
                                 Add Honor/Award
@@ -253,18 +253,18 @@
                             <button type="button" onclick="cancelHonor()" class="border border-gray-300 text-gray-700 px-4 py-2 rounded-md">
                                 Cancel
                             </button>
-                        </div>
+                        </div> {% endcomment %}
                     </div>
 
                     <!-- Add Honor Button -->
-                    <button
+                    {% comment %} <button
                         type="button"
                         class="w-full border-dashed border-2 border-gray-300 hover:border-gray-400 py-8 rounded-md"
                         onclick="document.getElementById('honor-form').style.display='block'"
                     >
                         <i data-lucide="plus" class="h-5 w-5 mr-2"></i>
                         Add Honor or Award
-                    </button>
+                    </button> {% endcomment %}
 
                     <!-- Examples Section -->
                     <div class="bg-gray-50 rounded-lg p-4">
@@ -302,15 +302,15 @@
             <div class="flex flex-col sm:flex-row gap-4 pt-6">
                 <button type="button" onclick="window.history.back()" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                     <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
-                    Previous: References
+                    Previous Step
                 </button>
                 <div class="flex gap-3 sm:ml-auto">
-                    <!-- <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <button type="submit" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                         <i data-lucide="save" class="h-4 w-4 mr-2"></i>
-                        Save Draft
-                    </button> -->
-                    <button type="submit" name="action" value="next" class="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
-                        Continue to Review
+                        Save 
+                    </button>
+                    <button type="submit" name="action" value="next" class="bg-[#722F37] hover:bg-[#5a252a] text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
+                        Continue
                         <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
                     </button>
                 </div>

@@ -34,9 +34,11 @@ urlpatterns = [
     path('cred/delete/<str:id>/', views.CredDelete, name="cred_delete"),
     path('cred/update/', views.CredUpdate, name="cred_update"),
     
-
     path('apply/5/', views.ApplyFive, name="applyfive"),
     path('apply/6/', views.ApplySix, name="applysix"),
+    path('ref/delete/<str:id>/', views.RefDelete, name="ref_delete"),
+    path('ref/update/', views.RefUpdate, name="ref_update"),
+
     path('apply/7/', views.ApplySeven, name="applyseven"),
     path('apply/8/', views.ApplyEight, name='apply_eight'),
     path('delete-file/<int:file_id>/', views.delete_file, name='delete_file'),
