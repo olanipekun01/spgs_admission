@@ -1078,7 +1078,7 @@ def ApplyEight(request):
                 if not messages.get_messages(request):
                     if uploaded_docs >= total_required:
                         messages.success(request, "Documents saved. Proceeding to review.")
-                        return redirect('/application/review/')
+                        return redirect('/apply/review/')
                     else:
                         messages.error(request, f"Please upload all {total_required} required documents before proceeding. Uploaded: {uploaded_docs}")
                 return redirect('/apply/8/')
