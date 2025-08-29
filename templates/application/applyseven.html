@@ -54,6 +54,9 @@
 
     <!-- Main Content -->
     <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% for message in messages %}
+            <h5 style="color: red">{{message}}</h5>
+        {% endfor %}
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">Additional Information</h1>
             <p class="text-gray-600">Provide details to enhance your application profile.</p>
@@ -157,7 +160,7 @@
                                         <button
                                             type="button"
                                             class="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded"
-                                            onclick="this.parentElement.parentElement.remove()"
+                                            onclick="window.location.href='/apply/7/delete/{{honor.id}}'"
                                         >
                                             <i data-lucide="x" class="h-4 w-4"></i>
                                         </button>
@@ -181,7 +184,7 @@
                                 <input
                                     type="text"
                                     id="honor-title-0"
-                                    name="honors[0][title]"
+                                    name="title"
                                     class="w-full border-gray-300 rounded-md mt-1"
                                     placeholder="e.g., Dean's List, Academic Excellence Award"
                                 >
@@ -200,7 +203,7 @@
                                 <input
                                     type="text"
                                     id="honor-organization-0"
-                                    name="honors[0][organization]"
+                                    name="organization"
                                     class="w-full border-gray-300 rounded-md mt-1"
                                     placeholder="e.g., University of Lagos, IEEE"
                                 >
@@ -219,7 +222,7 @@
                                 <input
                                     type="text"
                                     id="honor-year-0"
-                                    name="honors[0][year]"
+                                    name="year"
                                     class="w-full border-gray-300 rounded-md mt-1"
                                     placeholder="e.g., 2023"
                                     maxlength="4"
@@ -239,7 +242,7 @@
                                 <input
                                     type="text"
                                     id="honor-description-0"
-                                    name="honors[0][description]"
+                                    name="description"
                                     class="w-full border-gray-300 rounded-md mt-1"
                                     placeholder="Brief description or criteria"
                                 >

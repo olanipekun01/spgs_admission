@@ -17,7 +17,7 @@
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <h1 class="text-2xl font-bold text-[#722F37]">SPA</h1>
+                        <h1 class="text-2xl font-bold text-[#722F37]">CPS</h1>
                     </div>
                     <div class="ml-4">
                         <h2 class="text-lg font-medium text-gray-700">Application Form</h2>
@@ -57,6 +57,9 @@
 
     <!-- Main Content -->
     <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main">
+        {% for message in messages %}
+            <h5 style="color: red">{{message}}</h5>
+        {% endfor %}
         <div class="mb-8 text-center">
             <h1 class="text-3xl font-bold text-gray-900">Document Upload</h1>
             <p class="mt-2 text-gray-600">Upload all required documents to complete your application</p>
@@ -68,7 +71,7 @@
                 <div class="flex items-center gap-2">
                     <i data-lucide="alert-circle" class="h-4 w-4"></i>
                     <span>
-                        Required Documents: {{ completed_required }} of {{ total_required }} completed
+                        Required Documents: {{ uploaded_docs }} of {{ total_required }} completed
                     </span>
                 </div>
                 {% if completed_required == total_required %}
@@ -85,56 +88,83 @@
         </div>
 
         <!-- Document Categories -->
-        <form method="post" enctype="multipart/form-data" id="upload-form">
+        <form method="post" action="/apply/8/" enctype="multipart/form-data" id="upload-form">
             {% csrf_token %}
-            {% for category in document_categories %}
+            {% comment %} {% for category in document_categories %} {% endcomment %}
                 <div class="mb-6 bg-white shadow-lg rounded-lg">
                     <div class="p-6">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <div class="flex items-center gap-2">
-                                    <h2 class="text-lg font-semibold text-gray-900">{{ category.title }}</h2>
-                                    {% if category.required %}
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Required</span>
-                                    {% endif %}
-                                    {% if category.files.count > 0 %}
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            <i data-lucide="check-circle" class="h-3 w-3 mr-1"></i>
-                                            {{ category.files.count }} file{{ category.files.count|pluralize }}
-                                        </span>
-                                    {% endif %}
+                                    <h2 class="text-lg font-semibold text-gray-900">Upload Docucment</h2>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Required</span>
+                                    {% comment %} <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i data-lucide="check-circle" class="h-3 w-3 mr-1"></i>
+                                        {{ category.files.count }} file{{ category.files.count|pluralize }}
+                                    </span> {% endcomment %}
                                 </div>
                                 <p class="mt-1 text-sm text-gray-600">{{ category.description }}</p>
                                 <p class="mt-1 text-xs text-gray-500">
-                                    Accepted formats: {{ category.accepted_formats_list|join:', ' }} • Max size: {{ category.max_size_mb }}MB • Max files: {{ category.max_files }}
+                                    Accepted formats: PDF, JPG, PNG . Max size: 5MB . Max files: 5
                                 </p>
                             </div>
                         </div>
                         <div class="mt-4">
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                            <input
+                                type="text"
+                                id="doc-title-0"
+                                name="title"
+                                class="w-full bg-gray-300 border-gray-300 rounded-md py-3 pl-2 mt-1 mb-5"
+                                placeholder="Enter title e.g., Transcript, Certificate"
+                                
+                            >
+                            {% comment %} <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                                 <input
                                     type="file"
                                     multiple="{% if category.max_files > 1 %}multiple{% endif %}"
                                     accept="{{ category.accept_string }}"
                                     name="file"
-                                    onchange="document.getElementById('upload-form').querySelector('input[name=category_id]').value='{{ category.id }}'; document.getElementById('upload-form').submit();"
+                                    onchange=""
                                     class="hidden"
-                                    id="upload-{{ category.id }}"
+                                    id="upload-file"
                                 >
-                                <label for="upload-{{ category.id }}" class="cursor-pointer">
+                                <label for="upload-file" class="cursor-pointer">
                                     <i data-lucide="upload" class="mx-auto h-12 w-12 text-gray-400"></i>
                                     <div class="mt-2">
                                         <span class="text-sm font-medium text-blue-600 hover:text-blue-500">Click to upload</span>
                                         <span class="text-sm text-gray-500"> or drag and drop</span>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-1">
-                                        {{ category.accepted_formats_display }} up to {{ category.max_size_mb }}MB each
+                                        file up to 5MB each
                                     </p>
                                 </label>
-                                <input type="hidden" name="category_id" value="">
+                                {% comment %} <input type="hidden" name="category_id" value=""> 
+                            </div> {% endcomment %}
+
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"
+                                id="upload-area">
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept=".jpg,.jpeg,.png,.pdf"   
+                                    name="file"
+                                    class="hidden"
+                                    id="upload-file"
+                                >
+                                <label for="upload-file" class="cursor-pointer">
+                                    <i data-lucide="upload" class="mx-auto h-12 w-12 text-gray-400"></i>
+                                    <div class="mt-2">
+                                        <span class="text-sm font-medium text-blue-600 hover:text-blue-500">Click to upload</span>
+                                        <span class="text-sm text-gray-500"> or drag and drop</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        Files up to 5MB each
+                                    </p>
+                                </label>
+                                <div id="file-list" class="mt-4 text-sm text-gray-600"></div>
                             </div>
                         </div>
-                        {% if category.files.count > 0 %}
+                        {% comment %} {% if category.files.count > 0 %}
                             <div class="mt-4 space-y-2">
                                 <h4 class="text-sm font-medium text-gray-900">Uploaded Files</h4>
                                 {% for file in category.files.all %}
@@ -171,10 +201,31 @@
                                     </div>
                                 {% endfor %}
                             </div>
-                        {% endif %}
+                        {% endif %} {% endcomment %}
                     </div>
                 </div>
-            {% endfor %}
+            {% comment %} {% endfor %} {% endcomment %}
+
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+            
+                <button type="button" onclick="window.history.back()" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                    Previous Step
+                </button>
+                <div class="flex gap-3 sm:ml-auto">
+                    <button type="submit" id="saveupload" name="action" value="save" class="flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                        Save 
+                    </button>
+                    <button type="submit" name="action" value="next" class="bg-[#722F37] hover:bg-[#5a252a] text-white flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md">
+                        Complete Application
+                        <i data-lucide="arrow-right" class="h-4 w-4 ml-2"></i>
+                    </button>
+                </div>
+            
+
+           
+            </div>
         </form>
 
         <!-- Important Notes -->
@@ -193,39 +244,34 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-6">
-            <button
-                type="button"
-                onclick="localStorage.setItem('documentUploadState', 'saved'); alert('Progress saved! You can continue later.');"
-                class="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md"
-                aria-label="Save and Continue Later"
-            >
-                <i data-lucide="download" class="h-4 w-4 mr-2"></i>
-                Save and Continue Later
-            </button>
-            <button
-                type="button"
-                onclick="window.history.back()"
-                class="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md"
-                aria-label="Back to Previous Step"
-            >
-                Back to Previous Step
-            </button>
-            <button
-                type="submit"
-                formaction="/apply/8/"
-                name="action"
-                value="next"
-                class="flex-1 bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md"
-                {% if completed_required != total_required %}disabled{% endif %}
-                aria-label="Complete Application"
-            >
-                <i data-lucide="file-check" class="h-4 w-4 mr-2"></i>
-                Complete Application
-            </button>
+
+        <div class="credentials_container mt-[20px]">
+            {% for upload in uploadedDocs %}
+                <div class="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+                    <div class="space-y-2 mb-4">
+                        <div>
+                            <span class="block text-lg font-semibold text-gray-900">{{ upload.title }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-600">{{ upload.name }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">Size: {{upload.size}}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">Date {{ upload.upload_date }}</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="/doc/delete/{{ upload.id }}/" class="text-red-600 hover:text-red-800 font-medium text-sm transition-colors duration-200">Delete</a>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
 
-        {% if completed_required != total_required %}
+        
+
+        {% if uploaded != total_required %}
             <div class="p-4 mt-4 rounded-lg bg-red-50 border border-red-200" role="alert">
                 <div class="flex items-center gap-2">
                     <i data-lucide="alert-circle" class="h-4 w-4 text-red-500"></i>
@@ -244,18 +290,53 @@
     </footer>
 
     <script>
+        const uploadArea = document.getElementById("upload-area");
+        const fileInput = document.getElementById("upload-file");
+        const fileList = document.getElementById("file-list");
+
+        // Handle file selection
+        fileInput.addEventListener("change", () => {
+            displayFiles(fileInput.files);
+        });
+
+        // Drag & Drop
+        uploadArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            uploadArea.classList.add("border-blue-400");
+        });
+
+        uploadArea.addEventListener("dragleave", () => {
+            uploadArea.classList.remove("border-blue-400");
+        });
+
+        uploadArea.addEventListener("drop", (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove("border-blue-400");
+            fileInput.files = e.dataTransfer.files;
+            displayFiles(fileInput.files);
+        });
+
+        // Display selected files
+        function displayFiles(files) {
+            fileList.innerHTML = "";
+            for (const file of files) {
+                const li = document.createElement("div");
+                li.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                fileList.appendChild(li);
+            }
+        }
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
-            const form = document.getElementById('upload-form');
+            {% comment %} const form = document.getElementById('upload-form');
             if (form) {
                 form.addEventListener('submit', function() {
-                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const submitBtn = form.querySelector('#saveupload');
                     if (submitBtn) {
                         submitBtn.disabled = true;
                         submitBtn.textContent = 'Uploading...';
                     }
                 });
-            }
+            } {% endcomment %}
         });
     </script>
 </body>

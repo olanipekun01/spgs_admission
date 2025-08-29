@@ -40,9 +40,11 @@ urlpatterns = [
     path('ref/update/', views.RefUpdate, name="ref_update"),
 
     path('apply/7/', views.ApplySeven, name="applyseven"),
-
+    path('apply/7/delete/<str:id>/', views.AwardDelete, name="award_delete"),
 
     path('apply/8/', views.ApplyEight, name='apply_eight'),
+    path('doc/delete/<str:id>/', views.DocDelete, name="doc_delete"),
+
     path('delete-file/<int:file_id>/', views.delete_file, name='delete_file'),
 
     

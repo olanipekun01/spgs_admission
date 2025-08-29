@@ -957,50 +957,58 @@ def ApplySeven(request):
         # Handle POST request to save or update data
         if request.method == 'POST':
             action = request.POST.get('action')
-            additional_info_form = AdditionalInfoForm(request.POST, instance=additional_info)
-            honors_data = []
-
-            if additional_info_form.is_valid():
-                additional_info = additional_info_form.save()
-
-                # Process honors
-                # for i in range(3):  # Allow up to 3 honors
-                title = request.POST.get(f'honors[{i}][title]', '').strip()
+            if action == 'save' and not messages.get_messages(request):
+                title = request.POST.get(f'title', '').strip()
                 organization = request.POST.get(f'organization', '').strip()
                 year = request.POST.get(f'year', '').strip()
                 description = request.POST.get(f'description', '').strip()
+                additional_info_form = AdditionalInfoForm(request.POST, instance=additional_info)
+                honor_form = HonorForm(request.POST)
+                if additional_info_form.is_valid() and honor_form.is_valid():
+                    honor = Honor.objects.create(additional_info=additional_info, title=title, organization=organization, year=year, description=description)
+                    honor.save()
 
-                if title or organization or year or description:
-                    honor_data = {
-                        'title': title,
-                        'organization': organization,
-                        'year': year,
-                        'description': description,
-                        'additional_info': additional_info,
-                    }
-                    honors_data.append(honor_data)
+                    messages.success(request, "Additional information saved.")
+                    return redirect('/apply/7/')
+                
+                # if additional_info_form.is_valid():
+                #     additional_info = additional_info_form.save()
+                    
+                    # Process honors
+                    # for i in range(3):  # Allow up to 3 honors
+                    # title = request.POST.get(f'title', '').strip()
+                    # organization = request.POST.get(f'organization', '').strip()
+                    # year = request.POST.get(f'year', '').strip()
+                    # description = request.POST.get(f'description', '').strip()
 
-                # Delete existing honors and create new ones
-                Honor.objects.filter(additional_info=additional_info).delete()
-                for data in honors_data:
-                    honor_form = HonorForm(data)
-                    if honor_form.is_valid():
-                        honor_form.save()
-                    else:
-                        for field, errors in honor_form.errors.items():
-                            messages.error(request, f"{field.replace('_', ' ').capitalize()} error: {errors[0]}")
+                    # Honor.objects.filter(additional_info=additional_info).delete()
+                    # for data in honors_data:
+                    #     honor_form = HonorForm(data)
+                    #     if honor_form.is_valid():
+                    #         honor_form.save()
+                    #     else:
+                    #         for field, errors in honor_form.errors.items():
+                    #             messages.error(request, f"{field.replace('_', ' ').capitalize()} error: {errors[0]}")
 
-            if action == 'save' and not messages.get_messages(request):
-                messages.success(request, "Additional information saved as draft.")
+                messages.success(request, "Invalid Submission!")
                 return redirect('/apply/7/')
             elif action == 'next' and not messages.get_messages(request):
-                messages.success(request, "Additional information saved. Proceeding to review.")
-                return redirect('/application/review/')
+                messages.success(request, "Proceeding to upload document.")
+                return redirect('/apply/8/')
 
         return render(request, './application/applyseven.html', context)
 
     return redirect('/')  # Redirect if not authenticated
 
+
+def AwardDelete(request, id):
+    if request.user.is_authenticated:
+        user = request.user
+        honor = get_object_or_404(Honor, id=id)
+        honor.delete()
+        
+        messages.success(request, "Additional Info deleted!")
+        return redirect('/apply/7/') 
 
 class UploadedFileForm(forms.ModelForm):
     class Meta:
@@ -1017,99 +1025,80 @@ def ApplyEight(request):
         current_session = Session.objects.filter(is_current=True).first()
         context = {}
 
-        # Handle GET request to display existing data
-        document_categories = DocumentCategory.objects.filter(applicant=applicant, session=current_session)
-        if not document_categories.exists():
-            initial_categories = [
-                {'title': 'Statement of Purpose', 'description': 'Statement of Purpose', 'required': True, 'accepted_formats': ['PDF', 'JPG', 'PNG'], 'max_size_mb': 5, 'max_files': 1},
-                {'title': 'Academic Transcripts', 'description': 'Official transcripts from all institutions attended (undergraduate and any postgraduate)', 'required': True, 'accepted_formats': ['PDF', 'JPG', 'PNG'], 'max_size_mb': 5, 'max_files': 5},
-                {'title': 'Degree Certificates', 'description': 'Copies of all degree certificates and diplomas', 'required': True, 'accepted_formats': ['PDF', 'JPG', 'PNG'], 'max_size_mb': 5, 'max_files': 3},
-                {'title': 'Identification Document', 'description': 'Valid government-issued ID (National ID, Passport, or Driver\'s License)', 'required': True, 'accepted_formats': ['PDF', 'JPG', 'PNG'], 'max_size_mb': 2, 'max_files': 1},
-                {'title': 'Passport Photograph', 'description': 'Recent passport-sized photograph (white background preferred)', 'required': True, 'accepted_formats': ['JPG', 'PNG'], 'max_size_mb': 1, 'max_files': 1},
-                {'title': 'Professional Certificates', 'description': 'Any professional certifications, licenses, or credentials mentioned in your application', 'required': False, 'accepted_formats': ['PDF', 'JPG', 'PNG'], 'max_size_mb': 5, 'max_files': 10},
-                {'title': 'Employment Documents', 'description': 'Employment letters, contracts, or certificates of service', 'required': False, 'accepted_formats': ['PDF', 'JPG', 'PNG'], 'max_size_mb': 5, 'max_files': 5},
-                {'title': 'Research & Publications', 'description': 'Research papers, publications, or thesis documents', 'required': False, 'accepted_formats': ['PDF'], 'max_size_mb': 10, 'max_files': 10},
-                {'title': 'Supporting Documents', 'description': 'Any additional documents supporting your application (awards, recommendations, etc.)', 'required': False, 'accepted_formats': ['PDF', 'JPG', 'PNG', 'DOC', 'DOCX'], 'max_size_mb': 5, 'max_files': 10},
-            ]
-            for cat_data in initial_categories:
-                cat = DocumentCategory(applicant=applicant, session=current_session)
-                cat.title = cat_data['title']
-                cat.description = cat_data['description']
-                cat.required = cat_data['required']
-                cat.set_accepted_formats(cat_data['accepted_formats'])  # Use setter
-                cat.max_size_mb = cat_data['max_size_mb']
-                cat.max_files = cat_data['max_files']
-                cat.save()
 
-        document_categories = DocumentCategory.objects.filter(applicant=applicant, session=current_session)
-        required_categories = document_categories.filter(required=True)
-        completed_required = required_categories.filter(files__isnull=False).count()
-        total_required = required_categories.count()
-        missing_required = total_required - completed_required
+        docs = UploadedFile.objects.filter(applicant=applicant, session=current_session)
+        uploaded_docs = 0 if not docs.exists() else docs.count()
+        total_required = 5
+        missing_required = total_required - uploaded_docs
 
-        # Preprocess accepted_formats for each category
-        for category in document_categories:
-            category.accepted_formats_list = category.get_accepted_formats()  # Use the existing method
-            # Precompute the joined string for display
-            category.accepted_formats_display = ', '.join(category.accepted_formats_list)
-            # Precompute the accept attribute string for the file input (e.g., ".pdf,.jpg,.png")
-            category.accept_string = ','.join(f'.{fmt.lower()}' for fmt in category.accepted_formats_list)
-
-        context = {
-            'document_categories': document_categories,
-            'completed_required': completed_required,
-            'total_required': total_required,
-            'missing_required': missing_required,
-            'current_year': timezone.now().year,
-        }
-        if request.method == 'GET':
-            return render(request, './application/applyeight.html', context)
-
-        # Handle POST request to upload files
         if request.method == 'POST':
-            category_id = request.POST.get('category_id')
-            category = get_object_or_404(DocumentCategory, id=category_id, applicant=applicant, session=current_session)
+            title = request.POST.get('title', 'Untitled')  # Default to 'Untitled' if not provided
 
-            if 'file' in request.FILES:
-                files = request.FILES.getlist('file')
-                for file in files:
-                    file_extension = file.name.split('.').pop().upper()
-                    if file_extension not in category.get_accepted_formats():
-                        messages.error(request, f"Invalid file type for {category.title}. Accepted formats: {', '.join(category.get_accepted_formats())}")
-                        continue
+            
+            
+            action = request.POST.get('action')
+
+            if action == 'save':
+                if title.strip() == "":
+                    messages.error(request, f"Add title to file!")
+                    return redirect('/apply/8/')
+            
+                if request.FILES.get('file'):
+                    file = request.FILES['file']
+                    file_extension = file.name.split('.').pop().lower()
+                    if file_extension not in ['pdf', 'jpg', 'png']:
+                        messages.error(request, f"Invalid file type for {title}. Accepted formats: {', '.join(['pdf', 'jpg', 'png'])}")
+                        return redirect('/apply/8/')
 
                     file_size_mb = file.size / (1024 * 1024)
-                    if file_size_mb > category.max_size_mb:
-                        messages.error(request, f"File too large for {category.title}. Maximum size: {category.max_size_mb}MB")
-                        continue
+                    if file_size_mb > 5:
+                        messages.error(request, f"File too large for {title}. Maximum size: 5MB")
+                        return redirect('/apply/8/')
 
-                    if UploadedFile.objects.filter(document_category=category).count() >= category.max_files:
-                        messages.error(request, f"Maximum {category.max_files} files allowed for {category.title}")
-                        continue
+                    if UploadedFile.objects.filter(applicant=applicant, session=current_session).count() >= 5:
+                        messages.error(request, f"Maximum {7} files allowed for upload.")
+                        return redirect('/apply/8/')
 
                     uploaded_file = UploadedFile(
-                        document_category=category,
+                        applicant=applicant,
+                        session=current_session,
+                        title=title,
                         name=file.name,
                         file=file,
                         size=file.size,
                         status='completed'
                     )
                     uploaded_file.save()
-
-            action = request.POST.get('action')
-            if action == 'save':
-                messages.success(request, "Documents saved as draft.")
-                return redirect('/apply/8/')
-            elif action == 'next' and not messages.get_messages(request):
-                if completed_required == total_required:
-                    messages.success(request, "Documents saved. Proceeding to review.")
-                    return redirect('/application/review/')
+                    messages.success(request, "Document saved successfully.")
                 else:
-                    messages.error(request, "Please upload all required documents before proceeding.")
+                    messages.success(request, "No file attached. Please upload a document.")
+                return redirect('/apply/8/')
 
+            elif action == 'next':
+                if not messages.get_messages(request):
+                    if uploaded_docs >= total_required:
+                        messages.success(request, "Documents saved. Proceeding to review.")
+                        return redirect('/application/review/')
+                    else:
+                        messages.error(request, f"Please upload all {total_required} required documents before proceeding. Uploaded: {uploaded_docs}")
+                return redirect('/apply/8/')
+
+        context = {
+            'uploadedDocs': docs,
+            'uploaded_docs': uploaded_docs,
+            'total_required': total_required,
+        }
         return render(request, './application/applyeight.html', context)
 
-    return redirect('/')  # Redirect if not authenticated
+def DocDelete(request, id):
+    if request.user.is_authenticated:
+        user = request.user
+        file = get_object_or_404(UploadedFile, id=id)
+        file.delete()
+        
+        messages.success(request, "Uploaded file deleted!")
+        return redirect('/apply/8/') 
+    
 
 @csrf_exempt
 def delete_file(request, file_id):

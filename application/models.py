@@ -411,7 +411,10 @@ class DocumentCategory(models.Model):
         return self.title
 
 class UploadedFile(models.Model):
-    document_category = models.ForeignKey(DocumentCategory, on_delete=models.CASCADE, related_name='files')
+    applicant = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='uploaded_files', default=1)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, default=1)
+    title = models.CharField(max_length=255, default="text")
+    # document_category = models.ForeignKey(DocumentCategory, on_delete=models.CASCADE, related_name='files')
     name = models.CharField(max_length=255)
     file = models.FileField(upload_to='uploads/%Y/%m/%d/')
     size = models.PositiveIntegerField(help_text="Size in bytes")

@@ -20,6 +20,8 @@ admin.site.register(Reference)
 admin.site.register(AdditionalInformation)
 admin.site.register(Honor)
 
+admin.site.register(UploadedFile)
+
 
 # admin.site.register(NextOfKin)
 # admin.site.register(EducationHistory)
