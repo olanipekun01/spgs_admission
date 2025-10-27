@@ -124,7 +124,7 @@
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700">Title <span class="text-red-500">*</span></label>
                             <div class="flex flex-wrap gap-4">
-                                {% for value, label in personal.TITLE_CHOICES %}
+                                {% for value, label in titles %}
                                 <div class="flex items-center space-x-2">
                                     <input type="radio" name="title" value="{{ value }}" id="{{ value|lower }}" class="h-4 w-4" {% if personal.title == value %}checked{% endif %}>
                                     <label for="{{ value|lower }}" class="text-sm">{{ label }}</label>
@@ -222,7 +222,7 @@
                             <label for="stateOfOrigin" class="text-sm font-medium text-gray-700">State of Origin <span class="text-red-500">*</span></label>
                             <select id="stateOfOrigin" name="stateOfOrigin" class="w-full border-gray-300 rounded-md">
                                 <option value="">Select state of origin</option>
-                                {% for value, label in personal.STATE_OF_ORIGIN_CHOICES %}
+                                {% for value, label in state_of_origin %}
                                 <option value="{{ value }}" {% if personal.state_of_origin == value %}selected{% endif %}>{{ label }}</option>
                                 {% endfor %}
                                 <!-- <option value="">Select state of origin</option>
@@ -280,7 +280,7 @@
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700">Gender <span class="text-red-500">*</span></label>
                             <div class="flex gap-6">
-                                {% for value, label in personal.GENDER_CHOICES %}
+                                {% for value, label in gender %}
                                 <div class="flex items-center space-x-2">
                                     <input type="radio" name="gender" value="{{ value }}" id="{{ value|lower }}" class="h-4 w-4" {% if personal.gender == value %}checked{% endif %}>
                                     <label for="{{ value|lower }}" class="text-sm">{{ label }}</label>
@@ -300,7 +300,7 @@
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-gray-700">Marital Status <span class="text-red-500">*</span></label>
                             <div class="flex flex-wrap gap-4">
-                                {% for value, label in personal.MARITAL_STATUS_CHOICES %}
+                                {% for value, label in marital_status %}
                                 <div class="flex items-center space-x-2">
                                     <input type="radio" name="maritalStatus" value="{{ value }}" id="{{ value|lower }}" class="h-4 w-4" {% if personal.marital_status == value %}checked{% endif %}>
                                     <label for="{{ value|lower }}" class="text-sm">{{ label }}</label>
@@ -337,7 +337,7 @@
                         <div class="space-y-3">
                             <label class="text-sm font-medium text-gray-700">Religious Affiliation <span class="text-red-500">*</span></label>
                             <div class="flex flex-wrap gap-6">
-                                {% for value, label in personal.RELIGIOUS_AFFILIATION_CHOICES %}
+                                {% for value, label in religious_affliation %}
                                 <div class="flex items-center space-x-2">
                                     <input type="radio" name="religiousAffiliation" value="{{ value }}" id="{{ value|lower }}" class="h-4 w-4" {% if personal.religious_affiliation == value %}checked{% endif %}>
                                     <label for="{{ value|lower }}" class="text-sm">{{ label }}</label>

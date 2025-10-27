@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
@@ -279,12 +279,19 @@ def ApplyOne(request):
             context["applicant"] = application
 
     # Fetch all available programmes for the form
+
     programmes = Programme.objects.all()
     departments = Department.objects.all()
     colleges = College.objects.all()
     context['programme'] = programmes
     context['college'] = colleges
     context['department'] = departments
+
+    context['state_of_origin'] = PersonalInfo.STATE_OF_ORIGIN_CHOICES
+    context['titles'] = PersonalInfo.TITLE_CHOICES
+    context['marital_status'] = PersonalInfo.MARITAL_STATUS_CHOICES
+    context['gender'] = PersonalInfo.GENDER_CHOICES
+    context['religious_affliation'] = PersonalInfo.RELIGIOUS_AFFILIATION_CHOICES
 
     if request.method == "POST":
         # Retrieve data from the POST request
@@ -836,11 +843,11 @@ def ApplySix(request):
             action = request.POST.get('action')
             # Delete existing references if starting fresh (optional logic based on your needs)
             if action == 'save' and not messages.get_messages(request):
-                messages.success(request, "References saved!")
-                return redirect('/apply/6/')
-            
-                # Process submitted references
+                references = Reference.objects.filter(applicant=applicant, session=current_session)
                 
+                if len(references) >= 3:
+                    messages.success(request, "References already equal to 3!")
+                    return redirect('/apply/6/')
                 name = request.POST.get(f'references[name]', '')
                 position_rank = request.POST.get(f'references[position_rank]', '')
                 address = request.POST.get(f'references[address]', '')
@@ -863,6 +870,14 @@ def ApplySix(request):
                         reference.save()
                     except ValidationError as e:
                         messages.error(request, f"Invalid Request!")
+
+
+                messages.success(request, "References saved!")
+                return redirect('/apply/6/')
+            
+
+            
+                # Process submitted references
 
             elif action == 'next' and not messages.get_messages(request):
                 messages.success(request, "References saved. Proceeding to next step.")
@@ -1116,7 +1131,7 @@ def delete_file(request, file_id):
 def application_review(request):
     if request.method == 'POST':
         # Simulate submission logic
-        return HttpResponseRedirect(reverse('dashboard'))  # Replace with actual URL
+        return redirect('/apply/dashboard/')  # Replace with actual URL
 
     user = request.user
     applicant = Application.objects.get(applicant=user)
